@@ -1,0 +1,2196 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dog Care Manager</title>
+<meta name="theme-color" content="#1d5c46">
+<meta name="description" content="Track your dogs' care, puppy milestones, and expenses.">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="./icons/icon-180.png">
+<style>
+@property --p{syntax:'<number>';inherits:false;initial-value:0}
+:root{--bg:#eef3ec;--card:#fff;--tx:#12261d;--mut:#5f7268;--ac:#1d5c46;--acx:#e9d44c;--on:#fff;--bd:#d5e0d6;--red:#d6452b;--amb:#a8730a;--grn:#1f8a5b;--bar:#e9d44c;--sh:0 1px 2px rgba(18,38,29,.08),0 8px 18px -10px rgba(18,38,29,.25);color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--bg:#0e1a14;--card:#17271f;--tx:#e9f2ec;--mut:#93a89b;--ac:#4fb68a;--acx:#e9d44c;--on:#0e1a14;--bd:#27392f;--red:#ff8068;--amb:#e9b84a;--grn:#5fd49b;--bar:#b9a62e;--sh:0 8px 18px -10px rgba(0,0,0,.7);color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0 auto;max-width:680px;background:var(--bg);color:var(--tx);font:16px/1.45 ui-rounded,"SF Pro Rounded","Nunito","Segoe UI",system-ui,sans-serif;padding:calc(14px + env(safe-area-inset-top,0px)) 14px calc(96px + env(safe-area-inset-bottom,0px))}
+h1{font-size:1.4rem;font-weight:800;letter-spacing:-.01em;margin:4px 2px 10px;color:var(--ac)}
+h2{font-size:1.05rem;font-weight:800;margin:16px 0 8px}
+h3{font-size:.95rem;font-weight:700;margin:14px 0 6px}
+small,.mut{color:var(--mut);font-size:.82rem}
+nav{position:fixed;left:0;right:0;bottom:0;z-index:9;max-width:680px;margin:0 auto;display:flex;gap:4px;padding:6px 10px calc(8px + env(safe-area-inset-bottom,0px));background:color-mix(in srgb,var(--card) 90%,transparent);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-top:1px solid var(--bd)}
+.nav-links{display:flex;flex:1;min-width:0;gap:4px}
+.nav-links button{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:7px 2px;border:0;background:transparent;color:var(--mut);border-radius:16px;font-size:.72rem;font-weight:700;transition:background .2s,color .2s}
+.nav-links button .nav-icon{font-size:1.4rem;line-height:1;transition:transform .3s cubic-bezier(.3,1.7,.5,1)}
+.nav-links button.on{background:color-mix(in srgb,var(--ac) 15%,transparent);color:var(--ac)}
+.nav-links button.on .nav-icon{transform:translateY(-2px) scale(1.2)}
+.nav-toggle{display:none;align-items:center;justify-content:center;padding:10px;border:1px solid var(--bd);background:var(--bg);color:var(--tx);border-radius:12px;font-weight:700}
+.nav-toggle:hover{border-color:var(--ac);color:var(--ac)}
+.nav-toggle-icon{font-size:1.3rem;line-height:1;color:var(--ac)}
+.nav-toggle-label{display:none}
+.nav-brand{display:none}
+section{display:none}
+section.on{display:block;animation:in .22s ease-out}
+@keyframes in{from{opacity:0;transform:translateY(8px)}}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:18px;box-shadow:var(--sh);padding:14px;margin:12px 0}
+#sum{overflow:hidden;padding-top:0}
+.hero{display:flex;align-items:center;gap:14px;margin:0 -14px 8px;padding:18px 16px;background:var(--ac);color:var(--on)}
+.ring{width:78px;height:78px;border-radius:50%;flex:none;display:grid;place-items:center;background:conic-gradient(var(--acx) calc(var(--p)*1%),rgba(255,255,255,.25) 0);transition:--p 1s cubic-bezier(.2,.8,.2,1)}
+.ring b{width:60px;height:60px;border-radius:50%;display:grid;place-items:center;background:var(--ac);font-size:1.4rem;font-weight:800}
+.hi{font-size:1.2rem;font-weight:800}
+.hs{font-size:.92rem;opacity:.92}
+input,select{font:inherit;color:var(--tx);background:var(--bg);border:1.5px solid var(--bd);border-radius:12px;padding:10px;width:100%;transition:border-color .15s,box-shadow .15s}
+input:focus,select:focus{outline:0;border-color:var(--ac);box-shadow:0 0 0 3px color-mix(in srgb,var(--ac) 25%,transparent)}
+input[type=checkbox]{width:auto}
+button{font:inherit}
+button:focus-visible,summary:focus-visible{outline:3px solid var(--acx);outline-offset:2px}
+.btn{background:var(--ac);color:var(--on);border:0;border-radius:12px;padding:10px 14px;font-weight:700;transition:transform .12s,filter .12s}
+.btn:active,nav button:active{transform:scale(.94)}
+.btn.s{background:transparent;color:var(--ac);border:1.5px solid var(--ac)}
+.btn.d{background:transparent;color:var(--red);border:1px solid var(--bd);padding:6px 10px;font-size:.82rem;font-weight:600}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.w{grid-column:1/-1}
+.top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.task{border-top:1px solid var(--bd);padding:10px 0}
+.acts{display:flex;gap:6px;margin-top:6px}
+.acts input{flex:1}
+.badge{font-size:.75rem;font-weight:700;padding:3px 10px;border-radius:99px;background:color-mix(in srgb,currentColor 13%,transparent);white-space:nowrap}
+.over{color:var(--red)}.soon{color:var(--amb)}.ok{color:var(--grn)}.none{color:var(--mut)}
+.row{display:flex;gap:10px;align-items:center;padding:10px 0 10px 12px;border-top:1px solid var(--bd)}
+.row:has(.badge.over){box-shadow:inset 4px 0 var(--red)}
+.row:has(.badge.soon){box-shadow:inset 4px 0 var(--amb)}
+.row .g{flex:1}
+.bar{margin:8px 0}
+.bar i{display:block;height:12px;background:var(--bar);border-radius:6px;margin-top:3px;transform-origin:left;animation:grow .7s cubic-bezier(.2,.8,.2,1)}
+@keyframes grow{from{transform:scaleX(0)}}
+details{border:1px solid var(--bd);border-radius:18px;background:var(--card);padding:12px 14px;margin:10px 0;transition:box-shadow .2s}
+details[open]{box-shadow:var(--sh);border-color:color-mix(in srgb,var(--ac) 40%,var(--bd))}
+summary{cursor:pointer;list-style:none}
+summary::-webkit-details-marker{display:none}
+.chev{display:inline-block;transition:transform .2s;margin-right:6px;color:var(--ac)}
+details[open] .chev{transform:rotate(90deg)}
+.ms{padding:7px 0;border-top:1px solid var(--bd)}
+.ms input[type=number]{width:84px;flex:none}
+.btns{display:flex;gap:8px;flex-wrap:wrap}
+.note{margin-top:18px}
+.av{width:38px;height:38px;border-radius:50%;object-fit:cover;display:inline-grid;place-items:center;background:color-mix(in srgb,var(--ac) 14%,transparent);vertical-align:middle;margin-right:8px;font-size:1.1rem;flex:none}
+.av.big{width:84px;height:84px;border-radius:18px;font-size:2rem;margin-right:0}
+img.av:not([src]){visibility:hidden}
+dialog{border:0;border-radius:18px;padding:16px;background:var(--card);color:var(--tx);width:min(96vw,680px);max-height:90vh;overflow:auto;box-shadow:var(--sh)}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+.pedwrap{overflow-x:auto;margin-top:8px}
+.ped{width:100%;min-width:520px;border-collapse:collapse;font-size:.85rem}
+.ped td,.ped th{border:1px solid var(--bd);padding:6px;vertical-align:middle;text-align:left}
+.ped th{font-size:.75rem;color:var(--mut)}
+#sheet{display:none}
+@media print{
+  #sheet .ped{min-width:0}
+  #sheet .ped td,#sheet .ped th{border:1px solid #000}
+  body{background:#fff!important;color:#000!important;padding:0;max-width:none}
+  body>*:not(#sheet){display:none!important}
+  #sheet{display:block;font:12pt/1.4 Georgia,serif;color:#000}
+  #sheet h2{font-size:20pt;margin:0 0 4pt}
+  #sheet h3{font-size:12pt;margin:14pt 0 4pt;border-bottom:1px solid #000;padding-bottom:2pt}
+  #sheet table{width:100%;border-collapse:collapse;font-size:11pt}
+  #sheet td,#sheet th{border-bottom:1px solid #bbb;padding:3pt 4pt;text-align:left;vertical-align:top}
+  #sheet .id td:first-child{width:34%;font-weight:700}
+  #sheet small{color:#444;font-size:9.5pt}
+  #sheet .sig{display:flex;gap:28pt;margin-top:30pt}
+  #sheet .sig div{flex:1;border-top:1px solid #000;padding-top:3pt;font-size:10pt}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+body:not(.authenticated)>:not(#authScreen):not(script){display:none!important}
+body.authenticated #authScreen{display:none!important}
+#authScreen{max-width:680px;margin:12vh auto 0}
+#accountBar{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin:0 0 10px}
+#sync-status{flex:1;min-width:180px}
+@media (min-width:760px){
+  body{max-width:1180px;padding:24px 32px 32px 232px}
+  nav{left:0;right:auto;top:0;bottom:0;width:208px;max-width:none;height:100vh;height:100dvh;flex-direction:column;align-items:stretch;gap:8px;padding:22px 12px calc(18px + env(safe-area-inset-bottom,0px));background:var(--card);-webkit-backdrop-filter:none;backdrop-filter:none;border-top:0;border-right:1px solid var(--bd)}
+  .nav-brand{display:flex;align-items:center;gap:10px;padding:6px 10px 18px;color:var(--ac);font-weight:800;font-size:1.05rem}
+  .nav-brand span{font-size:1.5rem}
+  .nav-toggle{display:flex}
+  .nav-links{flex-direction:column;gap:8px}
+  .nav-links button{flex:none;flex-direction:row;justify-content:flex-start;gap:12px;padding:12px 14px;font-size:.92rem;text-align:left}
+  .nav-links button .nav-icon{width:24px;font-size:1.2rem}
+  body.nav-collapsed{padding-left:96px}
+  body.nav-collapsed nav{width:72px;padding-left:8px;padding-right:8px}
+  body.nav-collapsed .nav-brand,
+  body.nav-collapsed .nav-toggle-label,
+  body.nav-collapsed .nav-links button .nav-label{display:none}
+  body.nav-collapsed .nav-toggle{justify-content:center;padding:11px 8px}
+  body.nav-collapsed .nav-links button{justify-content:center;padding:12px 8px}
+  body.nav-collapsed .nav-links button .nav-icon{width:auto}
+}
+@media (min-width:600px) and (max-width:759px) and (orientation:landscape){
+  body{max-width:none;margin:0;padding:14px 16px 20px 174px}
+  nav{left:0;right:auto;top:0;bottom:0;width:158px;max-width:none;height:100vh;height:100dvh;flex-direction:column;align-items:stretch;gap:6px;padding:14px 8px calc(12px + env(safe-area-inset-bottom,0px));background:var(--card);-webkit-backdrop-filter:none;backdrop-filter:none;border-top:0;border-right:1px solid var(--bd)}
+  .nav-brand{display:flex;align-items:center;gap:8px;padding:4px 8px 10px;color:var(--ac);font-weight:800}
+  .nav-brand span{font-size:1.25rem}
+  .nav-toggle{display:flex}
+  .nav-links{flex-direction:column;gap:6px}
+  .nav-links button{flex:none;flex-direction:row;justify-content:flex-start;gap:8px;padding:10px 8px;font-size:.82rem;text-align:left}
+  .nav-links button .nav-icon{width:22px;font-size:1.1rem}
+  body.nav-collapsed{padding-left:78px}
+  body.nav-collapsed nav{width:62px;padding-left:5px;padding-right:5px}
+  body.nav-collapsed .nav-brand,
+  body.nav-collapsed .nav-toggle-label,
+  body.nav-collapsed .nav-links button .nav-label{display:none}
+  body.nav-collapsed .nav-toggle{justify-content:center;padding:10px 6px}
+  body.nav-collapsed .nav-links button{justify-content:center;padding:10px 6px}
+  body.nav-collapsed .nav-links button .nav-icon{width:auto}
+}
+</style>
+</head>
+<body>
+<div id="authScreen" class="card">
+  <h1>🐕 Dog Care Manager</h1>
+  <p>Sign in to sync your dog-care data across your devices.</p>
+  <div class="grid">
+    <div class="w"><label><small>Email</small></label><input id="authEmail" type="email" autocomplete="email" required></div>
+    <div class="w"><label><small>Password</small></label><input id="authPassword" type="password" autocomplete="current-password" minlength="8" required></div>
+    <div class="w btns">
+      <button class="btn" onclick="signIn()">Sign in</button>
+      <button class="btn s" onclick="signUp()">Create account</button>
+    </div>
+  </div>
+  <small id="authStatus" role="status"></small>
+</div>
+<div id="sheet"></div>
+<dialog id="ped"><div id="pedbody"></div><div class="btns" style="margin-top:12px"><button class="btn s" onclick="printPed()">Print</button><button class="btn" onclick="$('ped').close()">Close</button></div></dialog>
+<h1>🐕 Dog Care Manager</h1>
+<div id="accountBar">
+  <small>Signed in as <b id="accountEmail"></b></small>
+  <small id="sync-status" role="status">Connecting…</small>
+  <button id="syncReload" class="btn s" hidden onclick="reloadCloudData()">Load cloud copy</button>
+  <button id="syncRetry" class="btn s" hidden onclick="retryCloudSave()">Retry sync</button>
+  <button class="btn s" onclick="signOut()">Sign out</button>
+</div>
+<nav id="mainNav" aria-label="Main navigation">
+  <div class="nav-brand"><span>🐕</span> Dog Care Manager</div>
+  <button id="navToggle" class="nav-toggle" type="button" aria-controls="navLinks" aria-expanded="true" onclick="toggleNav()">
+    <span id="navToggleIcon" class="nav-toggle-icon" aria-hidden="true">‹</span>
+    <span id="navToggleLabel" class="nav-toggle-label">Collapse navigation</span>
+  </button>
+  <div id="navLinks" class="nav-links">
+    <button id="b-home" type="button" aria-label="Today" title="Today" onclick="setTab('home')"><span class="nav-icon" aria-hidden="true">🏠</span><span class="nav-label">Today</span></button>
+    <button id="b-dogs" type="button" aria-label="Dogs" title="Dogs" onclick="setTab('dogs')"><span class="nav-icon" aria-hidden="true">🐕</span><span class="nav-label">Dogs</span></button>
+    <button id="b-pups" type="button" aria-label="Puppies" title="Puppies" onclick="setTab('pups')"><span class="nav-icon" aria-hidden="true">🐶</span><span class="nav-label">Puppies</span></button>
+    <button id="b-money" type="button" aria-label="Money" title="Money" onclick="setTab('money')"><span class="nav-icon" aria-hidden="true">💰</span><span class="nav-label">Money</span></button>
+  </div>
+</nav>
+
+<!-- TODAY -->
+<section id="t-home">
+  <div class="card" id="sum"></div>
+  <div class="btns">
+    <button class="btn" onclick="enableNotify()">🔔 Notifications</button>
+    <button class="btn s" onclick="exportCalendar()">📅 Add to calendar</button>
+  </div>
+  <small id="nstat"></small><br><small>Notifications are only checked while the app is open. For reminders when it is closed, use Add to calendar.</small>
+
+  <h2>Optional backup</h2>
+  <div class="card">
+    <div class="btns">
+      <button class="btn" onclick="backup()">💾 Download backup</button>
+      <button class="btn s" onclick="document.getElementById('rfile').click()">📂 Restore</button>
+    </div>
+    <div class="btns" style="margin-top:10px">
+      <button class="btn s" onclick="exportCsv('dogs')">📄 Dogs (CSV)</button>
+      <button class="btn s" onclick="exportCsv('puppies')">📄 Puppies (CSV)</button>
+      <button class="btn s" onclick="exportCsv('expenses')">📄 Expenses (CSV)</button>
+      <button class="btn s" onclick="exportCsv('waitlist')">📄 Waitlist (CSV)</button>
+    </div>
+    <input id="rfile" type="file" accept=".json,application/json" style="display:none" onchange="restore(this.files[0])">
+    <p><small id="bstat"></small><br>
+    <small>Your records and photos save on this device and sync to your account when online. Download a backup as an extra copy.</small></p>
+  </div>
+
+  <h2>Settings</h2>
+  <div class="card">
+    <div class="grid">
+      <div><label><small>Currency symbol</small></label>
+        <input id="cur" maxlength="4" onchange="setCur(this.value)"></div>
+      <div><label><small>Puppies become adult dogs at (months)</small></label>
+        <input id="adultM" type="number" min="6" max="36" onchange="setAdult(this.value)"></div>
+    </div>
+    <p><small>Puppies that are Sold or Reserved stay in the Puppies tab. All others move to Dogs when they reach this age.</small></p>
+  </div>
+</section>
+
+<!-- DOGS -->
+<section id="t-dogs">
+  <div class="card"><div class="grid">
+    <div><label><small>Search dogs</small></label><input id="dq" type="search" placeholder="Name, microchip, breed…" oninput="render()"></div>
+    <div><label><small>Show</small></label><select id="dfilter" onchange="render()"><option value="all">All dogs</option><option value="current">Current dogs only</option><option value="former">Former and outside dogs</option></select></div>
+  </div><small id="dcount"></small></div>
+  <div class="card">
+    <div class="grid">
+      <div><label><small>Dog’s name</small></label><input id="dname" placeholder="e.g. Rex"></div>
+      <div><label><small>Breed</small></label><input id="dbreed" placeholder="e.g. Labrador"></div>
+      <div><label><small>Sex</small></label>
+        <select id="dsex"><option value="m">Male</option><option value="f">Female</option></select></div>
+      <div><label><small>Birth date (approx. is fine)</small></label><input id="dbirth" type="date"></div>
+      <div class="w"><button class="btn" style="width:100%" onclick="addDog()">Add dog</button></div>
+    </div>
+  </div>
+  <div id="app"></div>
+</section>
+
+<!-- PUPPIES -->
+<section id="t-pups">
+  <div class="card"><div class="grid">
+    <div><label><small>Search puppies</small></label><input id="pq" type="search" placeholder="Name, mother, buyer, microchip…" oninput="render()"></div>
+    <div><label><small>Status</small></label><select id="pfilter" onchange="render()"><option value="all">All</option><option>Available</option><option>Reserved</option><option>Sold</option><option>Kept</option><option>Deceased</option></select></div>
+  </div><small id="pcount"></small></div>
+  <div class="card">
+    <div class="grid">
+      <div><label><small>Puppy name or ID</small></label><input id="pname" placeholder="e.g. Red collar"></div>
+      <div><label><small>Breed</small></label><input id="pbreed" placeholder="e.g. Labrador"></div>
+      <div><label><small>Sex</small></label>
+        <select id="psex"><option value="m">Male</option><option value="f">Female</option></select></div>
+      <div><label><small>Birth date</small></label><input id="pbirth" type="date"></div>
+      <div><label><small>Birth weight in grams (optional)</small></label><input id="pbw" type="number" min="0" step="1" inputmode="numeric"></div>
+      <div><label><small>Mother (same name for the whole litter)</small></label><input id="pmother"></div>
+      <div class="w"><button class="btn" style="width:100%" onclick="addPuppy()">Add puppy</button></div>
+    </div>
+  </div>
+  <div id="pups"></div>
+  <div id="litters"></div>
+  <div id="wait"></div>
+  <div class="card"><h3 style="margin-top:0">Add to waitlist</h3>
+    <div class="grid"><div><label><small>Name</small></label><input id="wn"></div><div><label><small>Phone</small></label><input id="wp" type="tel"></div>
+    <div class="w"><button class="btn" style="width:100%" onclick="addWait()">Add to waitlist</button></div></div></div>
+</section>
+
+<!-- MONEY -->
+<section id="t-money">
+  <div class="card">
+    <div class="grid">
+      <div class="w"><label><small>For</small></label><select id="xfor"></select></div>
+      <div><label><small>Amount</small></label><input id="xamt" type="number" step="0.01" inputmode="decimal"></div>
+      <div><label><small>Date</small></label><input id="xdate" type="date"></div>
+      <div><label><small>Category</small></label>
+        <select id="xcat"><option>Food</option><option>Vet</option><option>Vaccine</option>
+          <option>Medicine</option><option>Grooming</option><option>Stud fee</option><option>Registration</option><option>Microchip</option><option>Health tests</option><option>Supplies</option><option>Transport</option><option>Other</option></select></div>
+      <div><label><small>Note (optional)</small></label><input id="xnote"></div>
+      <div class="w"><button class="btn" style="width:100%" onclick="addExpense()">Add expense</button></div>
+    </div>
+  </div>
+  <div id="exp"></div>
+</section>
+
+<p class="note"><small>Care intervals, whelping dates and weight notes are general guidelines. Puppies need more frequent shots and deworming, so always follow your vet’s advice.</small></p>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// ---------- STORAGE (falls back to memory if the browser blocks it) ----------
+let rawStorage;
+try { localStorage.setItem('_t', '1'); localStorage.removeItem('_t'); rawStorage = localStorage; }
+catch (e) { const m = {}; rawStorage = { getItem: k => k in m ? m[k] : null, setItem: (k, v) => { m[k] = String(v); }, removeItem: k => { delete m[k]; } }; }
+let ls = rawStorage;
+
+// ---------- DATA ----------
+let dogs = [], puppies = [], expenses = [], waitlist = [];
+let cur = '$';
+let tab = 'home';
+let adultM = 12;   // months until a puppy becomes an adult dog
+let chartMonth = '';
+
+const SUPABASE_URL = 'https://hgtgkzbnykorfsbuzlbc.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_FTzVmNiMqelKDkdz03wWdA_Kzoz1RaT';
+let supabaseClient = null;
+let currentUser = null;
+let cloudRevision = 0;
+let cloudSaveTimer = null;
+let cloudSaving = false;
+let cloudDirty = false;
+let cloudBlocked = false;
+let loadingCloud = false;
+
+const TPL = [
+  { k: 'vaccine', l: 'Vaccination / booster', iv: 365 },
+  { k: 'deworm',  l: 'Deworming', iv: 90 },
+  { k: 'flea',    l: 'Flea & tick treatment', iv: 30 },
+  { k: 'heart',   l: 'Heartworm prevention', iv: 30 },
+  { k: 'checkup', l: 'Vet check-up', iv: 365 },
+  { k: 'dental',  l: 'Dental care', iv: 180 },
+  { k: 'groom',   l: 'Grooming & nails', iv: 60 },
+  { k: 'heat',    l: 'Heat cycle (date it started)', iv: 180, f: true }
+];
+const PUP = [
+  { k: 'dw2',   l: 'Deworming #1 (2 weeks)', d: 14 },
+  { k: 'dw4',   l: 'Deworming #2 (4 weeks)', d: 28 },
+  { k: 'wean',  l: 'Start weaning (soft food)', d: 28 },
+  { k: 'dw6',   l: 'Deworming #3 (6 weeks)', d: 42 },
+  { k: 'vac1',  l: 'Vaccine #1 (6 weeks)', d: 42 },
+  { k: 'dw8',   l: 'Deworming #4 (8 weeks)', d: 56 },
+  { k: 'check', l: 'Vet check and microchip (8 weeks)', d: 56 },
+  { k: 'home',  l: 'Ready for new home (8 weeks)', d: 56 },
+  { k: 'vac2',  l: 'Vaccine #2 (10 weeks)', d: 70 },
+  { k: 'dw12',  l: 'Deworming #5 (12 weeks)', d: 84 },
+  { k: 'vac3',  l: 'Vaccine #3 (14 weeks)', d: 98 }
+];
+const VAX = ['Rabies', 'DHPP / DAPP (distemper, parvo)', 'Parvovirus', 'Distemper', 'Leptospirosis', 'Bordetella (kennel cough)', 'Lyme', 'Canine influenza'];
+
+const DSTAT = ['Active', 'Retired', 'Sold', 'Rehomed', 'Deceased', 'Outside'];
+const GONE = ['Sold', 'Rehomed', 'Deceased', 'Outside'];            // no reminders for these dogs
+const gone = d => GONE.includes(d.status);
+
+// ---------- HELPERS ----------
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const P = s => new Date(s + 'T12:00:00');
+const iso = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+const today = () => iso(new Date());
+const diff = (a, b) => Math.round((P(b) - P(a)) / 864e5);
+const addDays = (s, n) => { const d = P(s); d.setDate(d.getDate() + n); return iso(d); };
+const slug = s => String(s).toLowerCase().replace(/[^a-z0-9]+/g, '-');
+const M = n => cur + Number(n).toFixed(2);
+const fmt = n => String(Math.round(n * 100) / 100);
+const sgn = n => (n > 0 ? '+' : '') + fmt(n);
+function badge(left) {
+  if (left < 0)   return ['over', 'Overdue ' + (-left) + 'd'];
+  if (left === 0) return ['soon', 'Due today'];
+  if (left <= 7)  return ['soon', 'In ' + left + 'd'];
+  return ['ok', 'In ' + left + 'd'];
+}
+function ageText(birth) {
+  const m = Math.floor(diff(birth, today()) / 30.44);
+  return m < 24 ? m + ' months' : (m / 12).toFixed(1).replace('.0', '') + ' years';
+}
+function download(name, text, type) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([text], { type: type }));
+  a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+}
+function openKeys(id) {
+  return new Set([...document.querySelectorAll('#' + id + ' details[open]')].map(d => d.dataset.key));
+}
+function restoreOpen(id, set) {
+  document.querySelectorAll('#' + id + ' details').forEach(d => { d.open = set.has(d.dataset.key); });
+}
+
+// ---------- TABS & SETTINGS ----------
+function setTab(t) {
+  tab = t;
+  ls.setItem('tab', t);
+  ['home', 'dogs', 'pups', 'money'].forEach(k => {
+    $('t-' + k).classList.toggle('on', k === t);
+    $('b-' + k).classList.toggle('on', k === t);
+    if (k === t) $('b-' + k).setAttribute('aria-current', 'page');
+    else $('b-' + k).removeAttribute('aria-current');
+  });
+}
+function setNavCollapsed(collapsed, persist) {
+  const label = collapsed ? 'Expand navigation' : 'Collapse navigation';
+  document.body.classList.toggle('nav-collapsed', collapsed);
+  $('navToggle').setAttribute('aria-expanded', String(!collapsed));
+  $('navToggle').setAttribute('aria-label', label);
+  $('navToggle').title = label;
+  $('navToggleIcon').textContent = collapsed ? '›' : '‹';
+  $('navToggleLabel').textContent = label;
+  if (persist) {
+    try { rawStorage.setItem('dogcare-nav-collapsed', collapsed ? '1' : '0'); }
+    catch (error) { console.error('Dog Care Manager: navigation preference could not be saved.', error); }
+  }
+}
+function toggleNav() {
+  setNavCollapsed(!document.body.classList.contains('nav-collapsed'), true);
+}
+setNavCollapsed(rawStorage.getItem('dogcare-nav-collapsed') === '1', false);
+function setCur(v) {
+  cur = v.trim() || '$';
+  ls.setItem('cur', cur);
+  save();
+  render();
+}
+function setAdult(v) {
+  const n = parseInt(v, 10);
+  if (!(n >= 6 && n <= 36)) { $('adultM').value = adultM; alert('Enter a number of months between 6 and 36'); return; }
+  adultM = n;
+  ls.setItem('adultM', String(n));
+  const moved = autoGraduate();
+  save();
+  render();
+  if (moved.length) alert('Moved to adult dogs: ' + moved.join(', '));
+}
+
+// ---------- CARE RULES ----------
+function taskLabel(t) { return t.custom ? t.label : TPL.find(x => x.k === t.k).l; }
+function interval(dog, task) { return task.iv || baseInterval(dog, task); }
+function baseInterval(dog, task) {
+  const age = diff(dog.birth, today());
+  if (task.k === 'deworm')  return age < 84 ? 14 : age < 180 ? 30 : 90;
+  if (task.k === 'vaccine') return age < 112 ? 21 : 365;
+  return TPL.find(x => x.k === task.k).iv;
+}
+function sync(dog) {
+  if (!dog.status) dog.status = 'Active';
+  if (!dog.sex) dog.sex = 'm';
+  if (!dog.vax) dog.vax = [];
+  if (!dog.births) dog.births = [];
+  if (!dog.weights) dog.weights = [];
+  if (!dog.health) dog.health = [];
+  if (!dog.mated) dog.mated = '';
+  if (!dog.heats) dog.heats = [];
+  if (!dog.matings) dog.matings = [];
+  if (dog.mated && !dog.matings.some(m => m.date === dog.mated)) dog.matings.push({ date: dog.mated, sire: '', note: '' });
+  if (!dog.fromLitter) dog.fromLitter = '';
+  TPL.forEach(t => {
+    if (t.f && dog.sex !== 'f') return;
+    if (!dog.tasks.find(x => x.k === t.k)) dog.tasks.push({ k: t.k, last: '' });
+  });
+}
+function normalize() {
+  dogs = dogs.filter(d => d && d.name && d.birth);
+  dogs.forEach(d => {
+    d.breed = d.breed || '';
+    d.tasks = (d.tasks || []).filter(t => t.custom || TPL.find(x => x.k === t.k));
+    sync(d);
+    d.weights = d.weights.filter(w => w && isFinite(w.kg) && typeof w.date === 'string');
+    d.weights.forEach(w => { w.kg = Number(w.kg); w.deworm = !!w.deworm; w.note = w.note || ''; });
+  });
+  puppies = puppies.filter(p => p && p.name && p.birth);
+  puppies.forEach(p => {
+    p.done = p.done || {};
+    p.price = Number(p.price) || 0; p.deposit = Number(p.deposit) || 0; p.status = p.status || 'Available';
+    p.buyer = p.buyer || ''; p.mother = p.mother || ''; p.sex = p.sex || 'm';
+    p.breed = p.breed || '';
+    p.vax = p.vax || [];
+    p.health = p.health || [];
+    p.weights = (p.weights || []).filter(w => w && isFinite(w.g) && typeof w.date === 'string');
+    p.weights.forEach(w => { w.g = Number(w.g); w.k = w.k || ''; w.note = w.note || ''; });
+  });
+  expenses = expenses.filter(e => e && isFinite(e.amt) && typeof e.date === 'string');
+  expenses.forEach(e => { e.amt = Number(e.amt); e.for = e.for || ''; e.note = e.note || ''; e.cat = e.cat || 'Other'; });
+}
+
+// ---------- PUPPY -> ADULT DOG ----------
+function toDog(p) {
+  const dog = { name: p.name, breed: p.breed, dam: p.mother || '', sire: (((dogs.find(d => d.name === p.mother) || { births: [] }).births.find(b => b.date === p.birth)) || {}).sire || p.sire || '', photo: p.photo || '', chip: p.chip || '', reg: p.reg || '', regname: p.regname || '', color: p.color || '', sex: p.sex, birth: p.birth, tasks: [], vax: p.vax || [],
+                health: (p.health || []).map(r => ({ kind: r.kind, date: r.date, title: r.title, result: r.result, followUp: r.followUp, cost: r.cost })),
+                fromLitter: (p.mother || '') + '|' + p.birth,
+                weights: (p.weights || []).map(w => ({
+                  date: w.date, kg: Math.round(w.g) / 1000,
+                  deworm: /^dw/.test(w.k || ''),
+                  note: w.k === 'birth' ? 'Birth weight' : (w.note || '')
+                })) };
+  sync(dog);
+  const lastVax = dog.vax.map(v => v.date).sort().pop();     // carry the vaccine record into the yearly reminder
+  if (lastVax) { const t = dog.tasks.find(x => x.k === 'vaccine'); if (t) t.last = lastVax; }
+  return dog;
+}
+// moves puppies that have reached adult age (except Sold / Reserved) into the dogs list
+function autoGraduate() {
+  const moved = [];
+  puppies = puppies.filter(p => {
+    if (p.status === 'Sold' || p.status === 'Reserved' || p.status === 'Deceased') return true;
+    if (diff(p.birth, today()) / 30.44 < adultM) return true;
+    dogs.push(toDog(p));
+    moved.push(p.name);
+    return false;
+  });
+  return moved;
+}
+
+// ---------- SAVE / LOAD / BACKUP ----------
+function bindUserStorage(userId) {
+  const prefix = 'dogcare-user-' + userId + ':';
+  ls = {
+    getItem: key => rawStorage.getItem(prefix + key),
+    setItem: (key, value) => rawStorage.setItem(prefix + key, value),
+    removeItem: key => rawStorage.removeItem(prefix + key)
+  };
+}
+function readState(storage) {
+  const parse = (key, fallback) => {
+    const raw = storage.getItem(key);
+    return raw ? JSON.parse(raw) : fallback;
+  };
+  const storedDogs = parse('dogs', []);
+  const storedPuppies = parse('puppies', []);
+  const storedExpenses = parse('expenses', []);
+  const storedWaitlist = parse('waitlist', []);
+  return {
+    dogs: Array.isArray(storedDogs) ? storedDogs : [],
+    puppies: Array.isArray(storedPuppies) ? storedPuppies : [],
+    expenses: Array.isArray(storedExpenses) ? storedExpenses : [],
+    waitlist: Array.isArray(storedWaitlist) ? storedWaitlist : [],
+    cur: storage.getItem('cur') || '$',
+    adultM: parseInt(storage.getItem('adultM'), 10) || 12
+  };
+}
+function hasSavedRecords(state) {
+  return state.dogs.length + state.puppies.length + state.expenses.length + state.waitlist.length > 0;
+}
+function applyState(state) {
+  state = state && typeof state === 'object' ? state : {};
+  dogs = Array.isArray(state.dogs) ? state.dogs : [];
+  puppies = Array.isArray(state.puppies) ? state.puppies : [];
+  expenses = Array.isArray(state.expenses) ? state.expenses : [];
+  waitlist = Array.isArray(state.waitlist) ? state.waitlist : [];
+  cur = typeof state.cur === 'string' ? state.cur : '$';
+  adultM = Number.isInteger(state.adultM) && state.adultM >= 6 && state.adultM <= 36 ? state.adultM : 12;
+  tab = ls.getItem('tab') || 'home';
+  normWait();
+  normalize();
+}
+function storeLocalState() {
+  ls.setItem('dogs', JSON.stringify(dogs));
+  ls.setItem('puppies', JSON.stringify(puppies));
+  ls.setItem('expenses', JSON.stringify(expenses));
+  ls.setItem('waitlist', JSON.stringify(waitlist));
+  ls.setItem('cur', cur);
+  ls.setItem('adultM', String(adultM));
+}
+function cloudState() {
+  return { dogs, puppies, expenses, waitlist, cur, adultM };
+}
+function setSyncStatus(message, showReload, showRetry) {
+  $('sync-status').textContent = message;
+  $('syncReload').hidden = !showReload;
+  $('syncRetry').hidden = !showRetry;
+}
+function scheduleCloudSave() {
+  if (!currentUser) return;
+  cloudDirty = true;
+  ls.setItem('cloudPending', '1');
+  if (loadingCloud) return;
+  if (!navigator.onLine) {
+    setSyncStatus('Offline. Changes are saved here and queued to sync.', false, true);
+    return;
+  }
+  setSyncStatus('Changes saved on this device; syncing…');
+  clearTimeout(cloudSaveTimer);
+  cloudSaveTimer = setTimeout(flushCloudSave, 700);
+}
+async function flushCloudSave() {
+  if (!currentUser || cloudSaving || cloudBlocked) return;
+  if (!navigator.onLine) {
+    setSyncStatus('Offline. Changes are saved here and queued to sync.', false, true);
+    return;
+  }
+  cloudSaving = true;
+  let failed = false;
+  try {
+    while (cloudDirty && currentUser && !cloudBlocked) {
+      cloudDirty = false;
+      await flushPendingPhotoDeletes();
+      await syncReferencedPhotos();
+      const { data, error } = await supabaseClient.rpc('save_dogcare_state', {
+        p_data: cloudState(),
+        p_expected_revision: cloudRevision
+      });
+      if (error) {
+        cloudDirty = true;
+        if (error.message && error.message.includes('sync_conflict')) {
+          cloudBlocked = true;
+          setSyncStatus('Another device has newer data. Load the cloud copy before continuing to sync.', true);
+          return;
+        }
+        throw error;
+      }
+      cloudRevision = Number(data);
+      ls.setItem('cloudRevision', String(cloudRevision));
+    }
+    if (!cloudDirty && currentUser) {
+      ls.setItem('cloudPending', '0');
+      setSyncStatus('Synced to your account.');
+    }
+  } catch (error) {
+    failed = true;
+    console.error('Dog Care Manager: cloud save failed.', error);
+    cloudDirty = true;
+    ls.setItem('cloudPending', '1');
+    setSyncStatus('Sync failed. Your changes are saved here; retry when online.', false, true);
+  } finally {
+    cloudSaving = false;
+    if (cloudDirty && !cloudBlocked && !failed && currentUser) {
+      clearTimeout(cloudSaveTimer);
+      cloudSaveTimer = setTimeout(flushCloudSave, 1500);
+    }
+  }
+}
+function retryCloudSave() {
+  if (!currentUser || cloudBlocked) return;
+  cloudDirty = true;
+  flushCloudSave();
+}
+function save() {
+  storeLocalState();
+  scheduleCloudSave();
+}
+function load() {
+  try {
+    applyState(readState(ls));
+  } catch (error) {
+    console.error('Dog Care Manager: saved local data could not be read.', error);
+    applyState({});
+  }
+}
+async function fetchCloudState() {
+  return supabaseClient.from('dogcare_state').select('data, revision')
+    .eq('user_id', currentUser.id).maybeSingle();
+}
+function renderApp() {
+  $('cur').value = cur;
+  $('adultM').value = adultM;
+  $('xdate').value = today();
+  setTab(tab);
+  render();
+  updateNstat();
+  updateBackupStat();
+  checkNotify();
+}
+async function activateUser(user) {
+  if (currentUser && currentUser.id === user.id) return;
+  currentUser = user;
+  bindUserStorage(user.id);
+  $('accountEmail').textContent = user.email || '';
+  setSyncStatus('Loading your account…');
+  cloudBlocked = false;
+  cloudDirty = ls.getItem('cloudPending') === '1';
+  cloudRevision = parseInt(ls.getItem('cloudRevision'), 10) || 0;
+  uploadedPhotoIds.clear();
+  loadingCloud = true;
+  try {
+    const { data: row, error } = await fetchCloudState();
+    if (error) throw error;
+    const hasCache = ['dogs', 'puppies', 'expenses', 'waitlist'].some(key => ls.getItem(key) !== null);
+    const cached = hasCache ? readState(ls) : null;
+    if (row) {
+      const remoteRevision = Number(row.revision);
+      if (cloudDirty && cached) {
+        applyState(cached);
+        if (remoteRevision === cloudRevision) {
+          setSyncStatus('Local changes are waiting to sync.');
+        } else {
+          cloudBlocked = true;
+          setSyncStatus('This device and the cloud both changed. Load the cloud copy to resolve the conflict.', true);
+        }
+        cloudDirty = true;
+        storeLocalState();
+      } else {
+        cloudRevision = remoteRevision;
+        applyState(row.data || {});
+        storeLocalState();
+        ls.setItem('cloudRevision', String(cloudRevision));
+        ls.setItem('cloudPending', '0');
+        setSyncStatus('Synced to your account.');
+      }
+    } else {
+      if (cached && (cloudDirty || hasSavedRecords(cached))) {
+        applyState(cached);
+        cloudRevision = 0;
+        cloudDirty = true;
+        ls.setItem('cloudRevision', '0');
+        ls.setItem('cloudPending', '1');
+      } else {
+        const legacy = readState(rawStorage);
+        if (hasSavedRecords(legacy) && confirm('Saved dog-care data was found in this browser. Import it into this signed-in account?')) {
+          applyState(legacy);
+          storeLocalState();
+          cloudRevision = 0;
+          cloudDirty = true;
+          ls.setItem('cloudPending', '1');
+        } else {
+          applyState({});
+          storeLocalState();
+          cloudDirty = false;
+          ls.setItem('cloudPending', '0');
+        }
+      }
+    }
+    document.body.classList.add('authenticated');
+    renderApp();
+    const moved = autoGraduate();
+    if (moved.length) { save(); render(); }
+    if (moved.length) setTimeout(() => alert('Moved to adult dogs: ' + moved.join(', ')), 300);
+    if (!cloudDirty && navigator.onLine) {
+      syncReferencedPhotos().catch(error => {
+        console.error('Dog Care Manager: photo sync failed.', error);
+        setSyncStatus('Records are synced, but some photos could not sync. Check Storage setup and retry.');
+      });
+    }
+  } catch (error) {
+    console.error('Dog Care Manager: account data could not be loaded.', error);
+    const hasCache = ['dogs', 'puppies', 'expenses', 'waitlist'].some(key => ls.getItem(key) !== null);
+    if (hasCache) {
+      try {
+        applyState(readState(ls));
+        cloudRevision = parseInt(ls.getItem('cloudRevision'), 10) || 0;
+        cloudDirty = ls.getItem('cloudPending') === '1';
+        document.body.classList.add('authenticated');
+        renderApp();
+        setSyncStatus('Cloud unavailable. Using this device’s saved copy; changes will sync when reconnected.', false, cloudDirty);
+      } catch (localError) {
+        console.error('Dog Care Manager: local data could not be loaded.', localError);
+        setSyncStatus('Could not load cloud or local data. Check your connection and browser storage.');
+        currentUser = null;
+        document.body.classList.remove('authenticated');
+      }
+    } else {
+      setSyncStatus('Could not load cloud data. Check your connection and database setup.');
+      currentUser = null;
+      document.body.classList.remove('authenticated');
+    }
+  } finally {
+    loadingCloud = false;
+    if (cloudDirty && currentUser && !cloudBlocked) {
+      clearTimeout(cloudSaveTimer);
+      cloudSaveTimer = setTimeout(flushCloudSave, 700);
+    }
+  }
+}
+function deactivateUser() {
+  clearTimeout(cloudSaveTimer);
+  currentUser = null;
+  cloudRevision = 0;
+  cloudDirty = false;
+  cloudBlocked = false;
+  uploadedPhotoIds.clear();
+  dogs = []; puppies = []; expenses = []; waitlist = [];
+  cur = '$'; adultM = 12; tab = 'home';
+  ls = rawStorage;
+  document.body.classList.remove('authenticated');
+}
+function authMessage(message) {
+  $('authStatus').textContent = message;
+}
+async function signIn() {
+  const email = $('authEmail').value.trim(), password = $('authPassword').value;
+  if (!email || !password) { authMessage('Enter your email and password.'); return; }
+  authMessage('Signing in…');
+  const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+  if (error) { authMessage(error.message); return; }
+  await activateUser(data.user);
+}
+async function signUp() {
+  const email = $('authEmail').value.trim(), password = $('authPassword').value;
+  if (!email || !password) { authMessage('Enter an email and a password of at least 8 characters.'); return; }
+  authMessage('Creating account…');
+  const { data, error } = await supabaseClient.auth.signUp({ email, password });
+  if (error) { authMessage(error.message); return; }
+  if (data.session && data.user) await activateUser(data.user);
+  else authMessage('Account created. Check your email to confirm it, then sign in.');
+}
+async function signOut() {
+  if (cloudSaving) { setSyncStatus('Wait for the current sync to finish before signing out.'); return; }
+  if (cloudDirty && !confirm('Some changes have not synced yet. Sign out anyway? They will stay on this device.')) return;
+  const { error } = await supabaseClient.auth.signOut();
+  if (error) { setSyncStatus('Could not sign out: ' + error.message); return; }
+  deactivateUser();
+}
+async function reloadCloudData() {
+  if (!currentUser) return;
+  if (!confirm('Load the latest cloud data? A copy of this device’s current data will be kept locally.')) return;
+  ls.setItem('conflict-backup', JSON.stringify(cloudState()));
+  cloudBlocked = false;
+  cloudDirty = false;
+  loadingCloud = true;
+  try {
+    const { data: row, error } = await fetchCloudState();
+    if (error) throw error;
+    if (row) {
+      cloudRevision = row.revision;
+      applyState(row.data || {});
+      storeLocalState();
+      ls.setItem('cloudRevision', String(cloudRevision));
+      ls.setItem('cloudPending', '0');
+      renderApp();
+      setSyncStatus('Loaded the latest cloud copy.');
+    } else {
+      setSyncStatus('No cloud data was found.');
+    }
+  } catch (error) {
+    console.error('Dog Care Manager: cloud reload failed.', error);
+    setSyncStatus('Could not reload cloud data: ' + error.message, true);
+  } finally {
+    loadingCloud = false;
+  }
+}
+async function checkCloudUpdates() {
+  if (!currentUser || document.hidden) return;
+  if (!navigator.onLine) {
+    setSyncStatus('Offline. Changes are saved here and queued to sync.', false, cloudDirty);
+    return;
+  }
+  try {
+    hydratePhotos();
+    const { data: row, error } = await fetchCloudState();
+    if (error) throw error;
+    if (row && row.revision > cloudRevision) {
+      if (cloudDirty || cloudSaving) {
+        cloudBlocked = true;
+        setSyncStatus('This device and the cloud both changed. Load the cloud copy to resolve the conflict.', true);
+        return;
+      }
+      cloudRevision = row.revision;
+      loadingCloud = true;
+      applyState(row.data || {});
+      storeLocalState();
+      ls.setItem('cloudRevision', String(cloudRevision));
+      ls.setItem('cloudPending', '0');
+      renderApp();
+      setSyncStatus('Updated from another device.');
+    }
+    if (!cloudDirty && !cloudSaving) {
+      await flushPendingPhotoDeletes();
+      await syncReferencedPhotos();
+      if (row && row.revision <= cloudRevision) setSyncStatus('Synced to your account.');
+    }
+    if (cloudDirty && !cloudBlocked && !cloudSaving) flushCloudSave();
+  } catch (error) {
+    console.error('Dog Care Manager: cloud refresh failed.', error);
+    setSyncStatus('Cloud sync or photo upload failed. Your local data is still saved here; retry when online.', false, true);
+  } finally {
+    loadingCloud = false;
+  }
+}
+async function backup() {
+  let photos = {};
+  try { photos = await photoAll(); } catch (e) { photos = {}; }
+  const data = { app: 'dogcare', version: 3, saved: today(), cur: cur, adultM: adultM, dogs: dogs, puppies: puppies, expenses: expenses, waitlist: waitlist, photos: photos };
+  download('dog-care-backup-' + today() + '.json', JSON.stringify(data, null, 2), 'application/json');
+  ls.setItem('lastBackup', today());
+  updateBackupStat();
+  renderSummary();
+}
+function restore(file) {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = async () => {
+    $('rfile').value = '';
+    try {
+      const data = JSON.parse(reader.result);
+      if (data.app !== 'dogcare' || !Array.isArray(data.dogs) || !Array.isArray(data.puppies) || !Array.isArray(data.expenses)) throw new Error('bad');
+      if (!confirm('Replace everything currently in the app with this backup?')) return;
+      dogs = data.dogs; puppies = data.puppies; expenses = data.expenses;
+      waitlist = Array.isArray(data.waitlist) ? data.waitlist : []; normWait();
+      try {
+        await photoClear();
+        if (data.photos && typeof data.photos === 'object') for (const id of Object.keys(data.photos)) await photoPut(id, data.photos[id]);
+      } catch (e) { /* photos are optional */ }
+      if (data.cur) { cur = data.cur; ls.setItem('cur', cur); $('cur').value = cur; }
+      if (data.adultM >= 6 && data.adultM <= 36) { adultM = data.adultM; ls.setItem('adultM', String(adultM)); $('adultM').value = adultM; }
+      normalize(); save(); render();
+      alert('Backup restored.');
+    } catch (e) { alert('That file is not a valid Dog Care backup.'); }
+  };
+  reader.readAsText(file);
+}
+function updateBackupStat() {
+  const last = ls.getItem('lastBackup');
+  $('bstat').textContent = last
+    ? 'Last backup: ' + last + (diff(last, today()) > 30 ? ' (over a month ago)' : '')
+    : 'No backup yet';
+}
+
+// ---------- COLLECT CARE ITEMS ----------
+function collectItems() {
+  const items = []; let noDate = 0;
+  dogs.forEach(dog => dog.tasks.forEach(t => {
+    if (gone(dog)) return;
+    if (!t.last) { noDate++; return; }
+    const due = addDays(t.last, interval(dog, t));
+    items.push({ who: dog.name, what: taskLabel(t), left: diff(today(), due), due: due,
+                 uid: 'dog-' + slug(dog.name) + '-' + dog.birth + '-' + t.k });
+  }));
+  // follow-ups from vet visits and health records
+  dogs.forEach(dog => {
+    if (gone(dog)) return;
+    dog.health.forEach(r => {
+      if (!r.followUp) return;
+      items.push({ who: dog.name, what: 'Follow-up: ' + r.title, left: diff(today(), r.followUp), due: r.followUp,
+                   uid: 'fu-' + slug(dog.name) + '-' + dog.birth + '-' + r.date + '-' + slug(r.title) });
+    });
+  });
+  // follow-ups from puppy health records (a whole-litter record reminds once)
+  const seenFu = {};
+  puppies.forEach(p => {
+    if (p.status === 'Sold' || p.status === 'Deceased') return;
+    p.health.forEach(r => {
+      if (!r.followUp) return;
+      if (r.gid) { if (seenFu[r.gid]) return; seenFu[r.gid] = true; }
+      items.push({ who: r.gid ? (p.mother ? p.mother + '’s litter' : 'Litter') : p.name + ' (puppy)', what: 'Follow-up: ' + r.title,
+                   left: diff(today(), r.followUp), due: r.followUp, pup: true,
+                   uid: 'pfu-' + (r.gid || slug(p.name) + '-' + p.birth) + '-' + r.date + '-' + slug(r.title) });
+    });
+  });
+  // expected whelping dates (about 63 days after mating)
+  dogs.forEach(dog => {
+    if (gone(dog) || dog.sex !== 'f' || !dog.mated) return;
+    const due = addDays(dog.mated, 63), left = diff(today(), due);
+    if (left < -21) return;                       // ignore very old mating dates
+    items.push({ who: dog.name, what: 'Expected whelping (about 63 days after mating)', left: left, due: due,
+                 uid: 'whelp-' + slug(dog.name) + '-' + dog.mated });
+    [[28, 'Vet pregnancy check (about 4 weeks after mating)', 'preg28'], [55, 'Pre-whelping vet check or X-ray (about 8 weeks)', 'preg55']].forEach(([n, what, k]) => {
+      const d = addDays(dog.mated, n), lf = diff(today(), d);
+      if (lf >= -3) items.push({ who: dog.name, what: what, left: lf, due: d, uid: k + '-' + slug(dog.name) + '-' + dog.mated });
+    });
+  });
+  puppies.forEach(p => {
+    if (p.status === 'Sold' || p.status === 'Deceased') return;
+    PUP.forEach(m => {
+      if (p.done[m.k]) return;
+      const due = addDays(p.birth, m.d);
+      items.push({ who: p.name + ' (puppy)', what: m.l, left: diff(today(), due), due: due, pup: true,
+                   uid: 'pup-' + slug(p.name) + '-' + p.birth + '-' + m.k });
+    });
+  });
+  // booster reminders from the vaccine records (newest record of each vaccine only)
+  const pend = (who, list) => list.forEach((v, j) => {
+    if (!v.next) return;
+    if (list.some((w, k) => k !== j && w.name === v.name && (w.date > v.date || (w.date === v.date && k > j)))) return;
+    items.push({ who: who, what: 'Booster: ' + v.name, left: diff(today(), v.next), due: v.next,
+                 uid: 'vax-' + slug(who) + '-' + slug(v.name) + '-' + v.next });
+  });
+  dogs.forEach(d => { if (!gone(d)) pend(d.name, d.vax); });
+  puppies.forEach(p => { if (p.status !== 'Sold' && p.status !== 'Deceased') pend(p.name + ' (puppy)', p.vax); });
+  return { items: items, noDate: noDate };
+}
+
+// ---------- SUMMARY ----------
+function renderSummary() {
+  const c = collectItems();
+  const list = c.items.filter(x => x.left <= 7 && !(x.pup && x.left < -14)).sort((a, b) => a.left - b.left);
+  const hr = new Date().getHours(), hi = hr < 12 ? 'Good morning' : hr < 18 ? 'Good afternoon' : 'Good evening';
+  const total = c.items.length, pct = total ? Math.round((total - list.length) / total * 100) : 100;
+  const sub = (!dogs.length && !puppies.length) ? 'Add your first dog to get started' : list.length ? `${list.length} thing${list.length > 1 ? 's' : ''} need${list.length > 1 ? '' : 's'} you this week` : 'All caught up. Nothing due this week';
+  let html = `<div class="hero"><div class="ring" data-p="${pct}"><b>${list.length || '✓'}</b></div><div><div class="hi">${hi}</div><div class="hs">${sub}</div></div></div><h2 style="margin-top:0">Needs attention</h2>`;
+  if (!dogs.length && !puppies.length) {
+    html += '<p class="mut">Add a dog in the Dogs tab or a puppy in the Puppies tab to get started.</p>';
+  } else if (!list.length) {
+    html += '<p class="ok">Nothing due in the next 7 days. 👍</p>';
+  } else {
+    list.forEach(x => {
+      const b = badge(x.left);
+      html += `<div class="row"><span class="badge ${b[0]}">${b[1]}</span>
+               <div class="g">${esc(x.who)}: ${x.what}<br><small>${x.due}</small></div></div>`;
+    });
+  }
+  if (c.noDate) {
+    html += `<p><small>${c.noDate} dog task${c.noDate > 1 ? 's have' : ' has'} no date yet. Set the last-done date in the Dogs tab to get reminders.</small></p>`;
+  }
+  const lb = ls.getItem('lastBackup');
+  if ((dogs.length || puppies.length || expenses.length) && (!lb || diff(lb, today()) > 30)) {
+    html += '<p><small class="soon">⚠ ' + (lb ? 'Your last backup was over a month ago.' : 'You have no backup yet.') + ' Tap Download backup below.</small></p>';
+  }
+  $('sum').innerHTML = html;
+  const rg = $('sum').querySelector('.ring');
+  if (rg) requestAnimationFrame(() => requestAnimationFrame(() => rg.style.setProperty('--p', rg.dataset.p)));
+  return list;
+}
+
+// small tap feedback on phones that support it
+document.addEventListener('click', e => {
+  if (navigator.vibrate && e.target.closest('.btn:not(.d), nav button')) navigator.vibrate(12);
+});
+
+// ---------- NOTIFICATIONS ----------
+function updateNstat() {
+  const el = $('nstat');
+  if (!('Notification' in window)) { el.textContent = 'Notifications not supported here'; return; }
+  el.textContent = 'Notifications: ' + (Notification.permission === 'granted' ? 'on'
+                 : Notification.permission === 'denied' ? 'blocked in browser settings' : 'off');
+}
+function enableNotify() {
+  if (!('Notification' in window)) { alert('This browser does not support notifications'); return; }
+  Notification.requestPermission().then(() => {
+    updateNstat();
+    if (Notification.permission === 'granted') {
+      try { new Notification('Dog Care Manager', { body: 'Notifications are on.' }); } catch (e) {}
+      checkNotify();
+    }
+  });
+}
+function checkNotify() {
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+  if (ls.getItem('lastNotify') === today()) return;
+  const list = renderSummary().filter(x => x.left <= 0);
+  if (!list.length) return;
+  try {
+    new Notification('Dog Care: ' + list.length + ' item' + (list.length > 1 ? 's' : '') + ' need attention',
+      { body: list.slice(0, 3).map(x => x.who + ': ' + x.what).join('\n') });
+    ls.setItem('lastNotify', today());
+  } catch (e) {}
+}
+
+// ---------- CALENDAR EXPORT ----------
+const icsEsc = s => String(s).replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\n/g, '\\n');
+const ymd = s => s.replace(/-/g, '');
+function exportCalendar() {
+  const items = collectItems().items.filter(x => !(x.pup && x.left < -14));
+  if (!items.length) { alert('Nothing to export yet. Add dates to your dogs first.'); return; }
+  const stamp = new Date().toISOString().replace(/[-:]/g, '').slice(0, 15) + 'Z';
+  const lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Dog Care Manager//EN', 'CALSCALE:GREGORIAN'];
+  items.forEach(x => {
+    const day = x.due < today() ? today() : x.due;
+    lines.push('BEGIN:VEVENT', 'UID:' + x.uid + '@dogcare', 'DTSTAMP:' + stamp,
+      'DTSTART;VALUE=DATE:' + ymd(day), 'DTEND;VALUE=DATE:' + ymd(addDays(day, 1)),
+      'SUMMARY:' + icsEsc('🐕 ' + x.who + ': ' + x.what),
+      'DESCRIPTION:' + icsEsc('Due ' + x.due + '. Open Dog Care Manager and tap Done today when finished.'),
+      'BEGIN:VALARM', 'ACTION:DISPLAY', 'DESCRIPTION:Dog care tomorrow', 'TRIGGER:-PT15H', 'END:VALARM',
+      'BEGIN:VALARM', 'ACTION:DISPLAY', 'DESCRIPTION:Dog care today', 'TRIGGER:PT9H', 'END:VALARM',
+      'END:VEVENT');
+  });
+  lines.push('END:VCALENDAR');
+  download('dog-care.ics', lines.join('\r\n'), 'text/calendar');
+}
+
+// ---------- VACCINE RECORDS (dogs and puppies) ----------
+// kind: 'd' = adult dog, 'p' = puppy
+function vaxHtml(kind, i, list) {
+  const id = kind + i;
+  const rows = list.map((v, j) => [v, j]).sort((a, b) => b[0].date.localeCompare(a[0].date))
+    .map(([v, j]) => `<div class="row"><div class="g"><b>${esc(v.name)}</b> <small>· ${v.date}</small>${v.next ? '<br><small>Next due ' + v.next + '</small>' : ''}${v.note ? '<br><small>' + esc(v.note) + '</small>' : ''}</div><button class="btn d" onclick="delVax('${kind}', ${i}, ${j})">Delete</button></div>`).join('')
+    || '<small>No vaccines recorded yet.</small>';
+  const opts = VAX.map(n => `<option value="${esc(n)}">`).join('');
+  return `<h3>Vaccines given</h3>${rows}<div class="grid" style="margin-top:8px">
+    <div><label><small>Vaccine (pick or type)</small></label><input list="vl-${id}" id="vn-${id}"><datalist id="vl-${id}">${opts}</datalist></div>
+    <div><label><small>Date given</small></label><input type="date" id="vd-${id}" value="${today()}"></div>
+    <div><label><small>Next due (optional)</small></label><input type="date" id="vx-${id}"></div>
+    <div><label><small>Note / batch (optional)</small></label><input id="vt-${id}"></div>
+    <div class="w"><button class="btn s" style="width:100%" onclick="addVax('${kind}', ${i})">Record vaccine</button></div></div>`;
+}
+function addVax(kind, i) {
+  const id = kind + i, name = $('vn-' + id).value.trim(), date = $('vd-' + id).value;
+  if (!name || !date) { alert('Enter the vaccine name and the date given'); return; }
+  const o = (kind === 'd' ? dogs : puppies)[i];
+  o.vax.push({ name: name, date: date, next: $('vx-' + id).value, note: $('vt-' + id).value.trim() });
+  if (kind === 'd') {                                   // keep the yearly vaccination reminder in step
+    const t = o.tasks.find(x => x.k === 'vaccine');
+    if (t && (!t.last || date > t.last)) t.last = date;
+  }
+  save(); render();
+}
+function delVax(kind, i, j) {
+  if (!confirm('Delete this vaccine record?')) return;
+  (kind === 'd' ? dogs : puppies)[i].vax.splice(j, 1);
+  save(); render();
+}
+
+// ---------- WEIGHT CHART (used by dogs and puppies) ----------
+// points: [{ date, v, mark }]  mark = filled dot
+function weightChart(points, unit, legend) {
+  if (points.length < 2) return '';
+  const W = 300, H = 90, pad = 10;
+  const t = points.map(p => P(p.date).getTime()), vs = points.map(p => p.v);
+  const t0 = Math.min(...t), t1 = Math.max(...t), v0 = Math.min(...vs), v1 = Math.max(...vs);
+  const x = v => t1 === t0 ? W / 2 : pad + (v - t0) / (t1 - t0) * (W - 2 * pad);
+  const y = v => v1 === v0 ? H / 2 : H - pad - (v - v0) / (v1 - v0) * (H - 2 * pad);
+  const pts = points.map(p => x(P(p.date).getTime()).toFixed(1) + ',' + y(p.v).toFixed(1)).join(' ');
+  const dots = points.map(p => `<circle cx="${x(P(p.date).getTime()).toFixed(1)}" cy="${y(p.v).toFixed(1)}" r="4"
+      fill="${p.mark ? 'var(--ac)' : 'var(--card)'}" stroke="var(--ac)" stroke-width="2"/>`).join('');
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:90px" role="img" aria-label="Weight over time">
+      <polyline points="${pts}" fill="none" stroke="var(--ac)" stroke-width="2"/>${dots}</svg>
+    <small>${legend} Range ${fmt(v0)} to ${fmt(v1)} ${unit}.</small>`;
+}
+
+// ---------- WEIGHT RECORDS (adult dogs) ----------
+// Dewormer doses are usually based on weight, and the trend shows whether the dog is gaining, steady or losing.
+function weightHtml(i, dog) {
+  const id = 'w' + i;
+  const asc = dog.weights.map((w, j) => ({ w: w, j: j })).sort((a, b) => a.w.date.localeCompare(b.w.date));
+  let summary = '<small>No weights recorded yet.</small>', rows = '';
+  if (asc.length) {
+    const first = asc[0].w, last = asc[asc.length - 1].w;
+    summary = `<b>${fmt(last.kg)} kg</b> <small>on ${last.date}</small>`;
+    if (asc.length > 1) {
+      const prev = asc[asc.length - 2].w, d1 = last.kg - prev.kg, d0 = last.kg - first.kg;
+      const pct = prev.kg ? d1 / prev.kg * 100 : 0;
+      summary += `<br><small>Since previous weigh-in: <b class="${d1 < 0 ? 'over' : 'ok'}">${sgn(d1)} kg</b>
+        · Since first record: ${sgn(d0)} kg</small>`;
+      if (pct <= -5) summary += '<br><small class="over">Weight is down by 5% or more since the previous weigh-in. If this is not expected, ask your vet.</small>';
+    }
+    const dw = asc.filter(a => a.w.deworm);
+    if (dw.length > 1) {
+      const a = dw[dw.length - 2].w, b = dw[dw.length - 1].w, d = b.kg - a.kg;
+      summary += `<br><small>Between the last two dewormings: <b class="${d < 0 ? 'over' : 'ok'}">${sgn(d)} kg</b> (${a.date} to ${b.date})</small>`;
+    }
+    rows = asc.slice().reverse().map((a, n, arr) => {
+      const older = arr[n + 1];
+      const d = older ? a.w.kg - older.w.kg : null;
+      return `<div class="row"><div class="g"><b>${fmt(a.w.kg)} kg</b>
+        <small>· ${a.w.date}${a.w.deworm ? ' · at deworming' : ''}${a.w.note ? ' · ' + esc(a.w.note) : ''}</small>
+        ${d !== null ? `<br><small class="${d < 0 ? 'over' : 'ok'}">${sgn(d)} kg</small>` : ''}</div>
+        <button class="btn d" onclick="delDogWeight(${i}, ${a.j})">Delete</button></div>`;
+    }).join('');
+  }
+  return `<h3>Weight</h3>
+    <p><small>Dewormer doses are usually based on weight, so weigh your dog at each deworming to check the dose and track progress.</small></p>
+    <div>${summary}</div>
+    ${weightChart(asc.map(a => ({ date: a.w.date, v: a.w.kg, mark: a.w.deworm })), 'kg', 'Filled dots = weighed at a deworming.')}${rows}
+    <div class="grid" style="margin-top:8px">
+      <div><label><small>Weight (kg)</small></label><input type="number" step="0.01" min="0" inputmode="decimal" id="wk-${id}"></div>
+      <div><label><small>Date</small></label><input type="date" id="wd-${id}" value="${today()}"></div>
+      <div class="w"><label><small>Note (optional)</small></label><input id="wn-${id}"></div>
+      <div class="w"><label><input type="checkbox" id="wz-${id}"> Weighed at a deworming</label></div>
+      <div class="w"><button class="btn s" style="width:100%" onclick="addDogWeight(${i})">Record weight</button></div>
+    </div>`;
+}
+function addDogWeight(i) {
+  const id = 'w' + i, kg = parseFloat($('wk-' + id).value), date = $('wd-' + id).value;
+  if (!(kg > 0) || !date) { alert('Enter the weight in kg and the date'); return; }
+  dogs[i].weights.push({ date: date, kg: kg, deworm: $('wz-' + id).checked, note: $('wn-' + id).value.trim() });
+  save(); render();
+}
+function delDogWeight(i, j) {
+  if (!confirm('Delete this weight record?')) return;
+  dogs[i].weights.splice(j, 1);
+  save(); render();
+}
+// "Done today" for deworming: also records the weight if one was typed in
+function doneDeworm(i) {
+  const dog = dogs[i];
+  dog.tasks.find(t => t.k === 'deworm').last = today();
+  const kg = parseFloat($('dwk-' + i).value);
+  if (kg > 0) dog.weights.push({ date: today(), kg: kg, deworm: true, note: '' });
+  save(); render();
+}
+
+// ---------- BREEDING & BIRTH RECORDS (female dogs) ----------
+function birthsHtml(i, dog) {
+  const id = 'b' + i;
+  const cur = dog.matings.find(m => m.date === dog.mated), lastSire = cur ? cur.sire : '';
+  const sortedH = dog.heats.map(h => h.start).sort();
+  const gaps = sortedH.slice(1).map((d, k) => diff(sortedH[k], d));
+  const avg = gaps.length ? Math.round(gaps.reduce((a, b) => a + b, 0) / gaps.length) : 0;
+  const heatInfo = avg ? `<small>Typical gap about ${avg} days. Next heat likely around ${addDays(sortedH[sortedH.length - 1], avg)}.</small>` : '';
+  const heatRows = dog.heats.map((h, j) => [h, j]).sort((a, b) => b[0].start.localeCompare(a[0].start)).map(([h, j]) => {
+    const k = sortedH.indexOf(h.start), gap = k > 0 ? diff(sortedH[k - 1], h.start) : 0;
+    return `<div class="row"><div class="g"><b>${h.start}</b> <small>${gap ? '· ' + gap + ' days after the previous' : ''}${h.note ? ' · ' + esc(h.note) : ''}</small></div>
+      <button class="btn d" onclick="delHeat(${i}, ${j})">Delete</button></div>`;
+  }).join('') || '<small>No heat cycles logged yet.</small>';
+  const matRows = dog.matings.map((m, j) => [m, j]).sort((a, b) => b[0].date.localeCompare(a[0].date)).map(([m, j]) =>
+    `<div class="row"><div class="g"><b>${m.date}</b> <small>${m.sire ? '· sire: ' + esc(m.sire) : ''}${m.note ? ' · ' + esc(m.note) : ''}</small></div>
+      <button class="btn d" onclick="delMating(${i}, ${j})">Delete</button></div>`
+  ).join('') || '<small>No matings recorded yet.</small>';
+  let preg = '<small>No mating recorded.</small>';
+  if (dog.mated) {
+    const due = addDays(dog.mated, 63), b = badge(diff(today(), due));
+    preg = `<small>Expected whelping about ${due} (usually between ${addDays(dog.mated, 58)} and ${addDays(dog.mated, 68)}).
+      Ask your vet to confirm the pregnancy.</small> <span class="badge ${b[0]}">${b[1]}</span>`;
+  }
+  const rows = dog.births.map((b, j) => [b, j]).sort((a, b) => b[0].date.localeCompare(a[0].date))
+    .map(([b, j]) => {
+      const reg = puppies.filter(p => p.mother === dog.name && p.birth === b.date).length +
+                  dogs.filter(d => d.fromLitter === dog.name + '|' + b.date).length;
+      return `<div class="row"><div class="g"><b>${b.date}</b>
+        <small>· ${b.born} born${b.alive !== b.born ? ', ' + b.alive + ' alive' : ''}${b.sire ? ' · sire: ' + esc(b.sire) : ''}</small>
+        ${b.note ? '<br><small>' + esc(b.note) + '</small>' : ''}<br><small>${reg} puppies registered</small></div>
+        <div class="btns"><button class="btn s" onclick="startLitter(${i}, ${j})">Register puppies</button>
+        <button class="btn d" onclick="delBirth(${i}, ${j})">Delete</button></div></div>`;
+    }).join('') || '<small>No litters recorded yet.</small>';
+  return `<h3>Breeding &amp; births</h3>
+    <h3>Heat cycles</h3>${heatRows}
+    <div style="margin:4px 0">${heatInfo}</div>
+    <div class="grid">
+      <div><label><small>Heat started</small></label><input type="date" id="hd-${id}" value="${today()}"></div>
+      <div><label><small>Note (optional)</small></label><input id="hn-${id}"></div>
+      <div class="w"><button class="btn s" style="width:100%" onclick="addHeat(${i})">Log heat</button></div>
+    </div>
+    <h3>Matings</h3>${matRows}
+    <div class="grid" style="margin-top:6px">
+      <div><label><small>Mating date</small></label><input type="date" id="md-${id}" value="${today()}"></div>
+      <div><label><small>Sire (father)</small></label><input id="ms-${id}"></div>
+      <div class="w"><label><small>Note (optional)</small></label><input id="mn-${id}"></div>
+      <div class="w btns"><button class="btn s" onclick="addMating(${i})">Record mating</button>${dog.mated ? `<button class="btn d" onclick="notPregnant(${i})">Not pregnant</button>` : ''}</div>
+    </div>
+    <div style="margin-top:6px">${preg}</div>
+    <h3>Litters</h3>${rows}
+    <div class="grid" style="margin-top:8px">
+      <div><label><small>Date of birth</small></label><input type="date" id="bd-${id}" value="${today()}"></div>
+      <div><label><small>Sire (father)</small></label><input id="bs-${id}" value="${esc(lastSire)}"></div>
+      <div><label><small>Number born</small></label><input type="number" min="0" id="bn-${id}"></div>
+      <div><label><small>Born alive (blank = all)</small></label><input type="number" min="0" id="ba-${id}"></div>
+      <div class="w"><label><small>Notes (complications, C-section, vet…)</small></label><input id="bt-${id}"></div>
+      <div class="w"><button class="btn s" style="width:100%" onclick="addBirth(${i})">Record birth</button></div>
+    </div>`;
+}
+function setMated(i, v) { dogs[i].mated = v; save(); render(); }
+function addHeat(i) {
+  const id = 'b' + i, d = $('hd-' + id).value, dog = dogs[i];
+  if (!d) { alert('Enter the date the heat started'); return; }
+  dog.heats.push({ start: d, note: $('hn-' + id).value.trim() });
+  const t = dog.tasks.find(x => x.k === 'heat');          // keeps the heat reminder in step
+  if (t && (!t.last || d > t.last)) t.last = d;
+  save(); render();
+}
+function delHeat(i, j) {
+  if (!confirm('Delete this heat record?')) return;
+  const dog = dogs[i];
+  dog.heats.splice(j, 1);
+  const latest = dog.heats.map(h => h.start).sort().pop(), t = dog.tasks.find(x => x.k === 'heat');
+  if (latest && t) t.last = latest;
+  save(); render();
+}
+function addMating(i) {
+  const id = 'b' + i, d = $('md-' + id).value, dog = dogs[i];
+  if (!d) { alert('Enter the mating date'); return; }
+  dog.matings.push({ date: d, sire: $('ms-' + id).value.trim(), note: $('mn-' + id).value.trim() });
+  dog.mated = dog.matings.map(m => m.date).sort().pop();   // the latest mating drives the whelping date
+  save(); render();
+}
+function delMating(i, j) {
+  if (!confirm('Delete this mating record?')) return;
+  const dog = dogs[i];
+  dog.matings.splice(j, 1);
+  if (dog.mated) dog.mated = dog.matings.map(m => m.date).sort().pop() || '';
+  save(); render();
+}
+function notPregnant(i) { dogs[i].mated = ''; save(); render(); }
+function addBirth(i) {
+  const id = 'b' + i, dog = dogs[i], date = $('bd-' + id).value;
+  if (!date) { alert('Enter the date of birth'); return; }
+  const born = parseInt($('bn-' + id).value, 10) || 0;
+  const aliveRaw = $('ba-' + id).value;
+  const alive = aliveRaw === '' ? born : (parseInt(aliveRaw, 10) || 0);
+  if (alive > born) { alert('Born alive cannot be more than the number born'); return; }
+  dog.births.push({ date: date, sire: $('bs-' + id).value.trim(), born: born, alive: alive, note: $('bt-' + id).value.trim() });
+  dog.mated = '';                                       // pregnancy is over
+  save(); render();
+}
+function delBirth(i, j) {
+  if (!confirm('Delete this litter record?')) return;
+  dogs[i].births.splice(j, 1);
+  save(); render();
+}
+// jump to the puppy form with the mother, birth date and breed filled in
+function startLitter(i, j) {
+  const dog = dogs[i], b = dog.births[j];
+  $('pmother').value = dog.name;
+  $('pbirth').value = b.date;
+  $('pbreed').value = dog.breed;
+  setTab('pups');
+  window.scrollTo(0, 0);
+  $('pname').focus();
+}
+
+// ---------- DOGS ----------
+function addDog() {
+  const name = $('dname').value.trim(), birth = $('dbirth').value;
+  if (!name || !birth) { alert('Enter a name and birth date'); return; }
+  const dog = { name: name, breed: $('dbreed').value.trim(), sex: $('dsex').value, birth: birth, tasks: [] };
+  sync(dog); dogs.push(dog);
+  $('dname').value = ''; $('dbreed').value = '';
+  save(); render();
+}
+function delDog(i) {
+  if (!confirm('Remove ' + dogs[i].name + ' and all their reminders?')) return;
+  if (dogs[i].photo) photoDel(dogs[i].photo);
+  dogs.splice(i, 1); save(); render();
+}
+function setDogStatus(i, v) { dogs[i].status = v; save(); render(); }
+// identity fields shared by dog and puppy cards (kind is 'Dog' or 'Pup')
+function idFields(kind, i, o) {
+  const f = (k, label, ph) => `<div><label><small>${label}</small></label><input value="${esc(o[k] || '')}" placeholder="${ph}" onchange="${k === 'chip' ? `chipClash('${kind}', ${i}, this.value);` : ''}set${kind}(${i}, '${k}', this.value)"></div>`;
+  return f('chip', 'Microchip number', '15 digits') + f('reg', 'Registration number', 'Kennel club no.') + f('regname', 'Registered name', 'Full pedigree name') + f('color', 'Color / markings', 'e.g. black and tan');
+}
+function chipClash(kind, i, v) {
+  const me = (kind === 'Dog' ? dogs : puppies)[i], n = v.replace(/\s/g, '');
+  const dup = n && dogs.concat(puppies).find(o => o !== me && (o.chip || '').replace(/\s/g, '') === n);
+  if (dup) alert('That microchip number is already saved for ' + dup.name + '. Check it for a typing mistake.');
+}
+function setDog(i, f, v) { dogs[i][f] = v.trim(); save(); render(); }
+// ---------- VET & HEALTH RECORDS ----------
+const HKINDS = ['Vet visit', 'Medication', 'Health test'];
+const HIDEAS = ['Check-up', 'Hip score', 'Elbow score', 'Eye exam', 'DNA test', 'Heart check', 'Brucellosis test', 'Wound treatment'];
+function healthHtml(i, dog) {
+  const rows = dog.health.map((r, j) => [r, j]).sort((a, b) => b[0].date.localeCompare(a[0].date)).map(([r, j]) => {
+    const fu = r.followUp ? `<br><small>Follow-up ${r.followUp}</small> <button class="btn s" onclick="doneFollow(${i}, ${j})">Follow-up done</button>` : '';
+    return `<div class="row"><div class="g"><b>${esc(r.title)}</b> <small>· ${r.kind} · ${r.date}${r.cost ? ' · ' + M(r.cost) : ''}</small>
+      ${r.result ? '<br><small>' + esc(r.result) + '</small>' : ''}${fu}</div>
+      <button class="btn d" onclick="delHealth(${i}, ${j})">Delete</button></div>`;
+  }).join('') || '<small>No records yet.</small>';
+  return `<h3>Vet &amp; health records</h3>${rows}
+    <div class="grid" style="margin-top:8px">
+      <div><label><small>Type</small></label><select id="hr-k-${i}">${HKINDS.map(k => `<option>${k}</option>`).join('')}</select></div>
+      <div><label><small>Date</small></label><input type="date" id="hr-d-${i}" value="${today()}"></div>
+      <div class="w"><label><small>What was done (pick or type)</small></label><input id="hr-t-${i}" list="hr-l-${i}" placeholder="e.g. Hip score">
+        <datalist id="hr-l-${i}">${HIDEAS.map(x => `<option value="${x}">`).join('')}</datalist></div>
+      <div class="w"><label><small>Result, medicine or dose (optional)</small></label><input id="hr-r-${i}" placeholder="e.g. Hips 4/5, or amoxicillin twice a day for 5 days"></div>
+      <div><label><small>Follow-up date (optional)</small></label><input type="date" id="hr-f-${i}"></div>
+      <div><label><small>Cost (optional, added to Money)</small></label><input type="number" step="0.01" min="0" inputmode="decimal" id="hr-c-${i}"></div>
+      <div class="w"><button class="btn s" style="width:100%" onclick="addHealth(${i})">Save record</button></div>
+    </div>`;
+}
+function addHealth(i) {
+  const dog = dogs[i], title = $('hr-t-' + i).value.trim(), date = $('hr-d-' + i).value;
+  if (!title || !date) { alert('Enter what was done and the date'); return; }
+  const kind = $('hr-k-' + i).value, cost = parseFloat($('hr-c-' + i).value) || 0;
+  dog.health.push({ kind: kind, date: date, title: title, result: $('hr-r-' + i).value.trim(), followUp: $('hr-f-' + i).value, cost: cost });
+  if (cost > 0) expenses.push({ amt: cost, cat: kind === 'Vet visit' ? 'Vet' : kind === 'Medication' ? 'Medicine' : 'Health tests',
+                                note: title, for: 'dog:' + dog.name + '|' + dog.birth, date: date });
+  save(); render();
+}
+function doneFollow(i, j) { dogs[i].health[j].followUp = ''; save(); render(); }
+function delHealth(i, j) {
+  if (!confirm('Delete this record? Any cost already added stays in the Money tab.')) return;
+  dogs[i].health.splice(j, 1);
+  save(); render();
+}
+// ---------- PUPPY VET & HEALTH RECORDS ----------
+const PIDEAS = ['First vet check', 'Health check before sale', 'Heart check', 'Eye exam', 'DNA test', 'Medication course', 'Illness or injury'];
+function healthPupHtml(i, p) {
+  const rows = p.health.map((r, j) => [r, j]).sort((a, b) => b[0].date.localeCompare(a[0].date)).map(([r, j]) => {
+    const fu = r.followUp ? `<br><small>Follow-up ${r.followUp}</small> <button class="btn s" onclick="donePupFollow(${i}, ${j})">Follow-up done</button>` : '';
+    return `<div class="row"><div class="g"><b>${esc(r.title)}</b> <small>· ${r.kind} · ${r.date}${r.gid ? ' · whole litter' : ''}${r.cost && !r.gid ? ' · ' + M(r.cost) : ''}</small>
+      ${r.result ? '<br><small>' + esc(r.result) + '</small>' : ''}${fu}</div>
+      <button class="btn d" onclick="delPupHealth(${i}, ${j})">Delete</button></div>`;
+  }).join('') || '<small>No records yet.</small>';
+  return `<h3>Vet &amp; health records</h3>${rows}
+    <div class="grid" style="margin-top:8px">
+      <div><label><small>Type</small></label><select id="ph-k-${i}">${HKINDS.map(k => `<option>${k}</option>`).join('')}</select></div>
+      <div><label><small>Date</small></label><input type="date" id="ph-d-${i}" value="${today()}"></div>
+      <div class="w"><label><small>What was done (pick or type)</small></label><input id="ph-t-${i}" list="ph-l-${i}" placeholder="e.g. First vet check">
+        <datalist id="ph-l-${i}">${PIDEAS.map(x => `<option value="${x}">`).join('')}</datalist></div>
+      <div class="w"><label><small>Result, medicine or dose (optional)</small></label><input id="ph-r-${i}" placeholder="What the vet found or prescribed"></div>
+      <div><label><small>Follow-up date (optional)</small></label><input type="date" id="ph-f-${i}"></div>
+      <div><label><small>Cost (optional, counts toward the litter)</small></label><input type="number" step="0.01" min="0" inputmode="decimal" id="ph-c-${i}"></div>
+      <div class="w"><label><input type="checkbox" id="ph-a-${i}"> Applies to the whole litter (saved on every puppy, cost counted once)</label></div>
+      <div class="w"><button class="btn s" style="width:100%" onclick="addPupHealth(${i})">Save record</button></div>
+    </div>`;
+}
+function addPupHealth(i) {
+  const p = puppies[i], title = $('ph-t-' + i).value.trim(), date = $('ph-d-' + i).value;
+  if (!title || !date) { alert('Enter what was done and the date'); return; }
+  const kind = $('ph-k-' + i).value, cost = parseFloat($('ph-c-' + i).value) || 0, all = $('ph-a-' + i).checked;
+  const key = (p.mother || '') + '|' + p.birth, gid = all ? 'g' + Date.now().toString(36) : '';
+  const rec = { kind: kind, date: date, title: title, result: $('ph-r-' + i).value.trim(), followUp: $('ph-f-' + i).value, cost: all ? 0 : cost, gid: gid };
+  const targets = all ? puppies.filter(q => (q.mother || '') + '|' + q.birth === key && q.status !== 'Deceased') : [p];
+  targets.forEach(q => q.health.push(Object.assign({}, rec)));
+  if (cost > 0) expenses.push({ amt: cost, cat: kind === 'Vet visit' ? 'Vet' : kind === 'Medication' ? 'Medicine' : 'Health tests',
+                                note: (all ? 'Whole litter: ' : p.name + ': ') + title, for: 'litter:' + key, date: date });
+  save(); render();
+}
+function donePupFollow(i, j) {
+  const r = puppies[i].health[j];
+  if (r.gid) puppies.forEach(q => q.health.forEach(x => { if (x.gid === r.gid) x.followUp = ''; }));
+  else r.followUp = '';
+  save(); render();
+}
+function delPupHealth(i, j) {
+  const r = puppies[i].health[j];
+  if (r.gid) {
+    if (!confirm('This record is for the whole litter. Delete it for every puppy? Any cost stays in the Money tab.')) return;
+    puppies.forEach(q => { q.health = q.health.filter(x => x.gid !== r.gid); });
+  } else {
+    if (!confirm('Delete this record? Any cost already added stays in the Money tab.')) return;
+    puppies[i].health.splice(j, 1);
+  }
+  save(); render();
+}
+// ---------- PEDIGREE (family tree by name, three generations) ----------
+function pedSubject(kind, i) {
+  if (kind === 'Dog') return dogs[i];
+  const p = puppies[i], mom = dogs.find(d => d.name === p.mother), lit = mom && mom.births.find(b => b.date === p.birth);
+  return Object.assign({}, p, { dam: p.mother || '', sire: (lit && lit.sire) || p.sire || '' });
+}
+function pedHtml(o) {
+  const find = n => n ? (dogs.find(d => d.name.trim().toLowerCase() === n.trim().toLowerCase()) || null) : null;
+  const node = n => ({ name: n || '', o: find(n) });
+  const par = (n, k) => node(n.o ? n.o[k] : '');
+  const top = { name: o.name, o: o };
+  const g1 = [par(top, 'sire'), par(top, 'dam')];
+  const g2 = [par(g1[0], 'sire'), par(g1[0], 'dam'), par(g1[1], 'sire'), par(g1[1], 'dam')];
+  const g3 = [];
+  g2.forEach(n => g3.push(par(n, 'sire'), par(n, 'dam')));
+  const cell = (n, rs) => {
+    const info = n.o ? [n.o.regname, n.o.reg, n.o.color].filter(Boolean).map(esc).join(' · ') : '';
+    return `<td rowspan="${rs}">${n.name ? '<b>' + esc(n.name) + '</b>' : '<small>unknown</small>'}${info ? '<br><small>' + info + '</small>' : ''}</td>`;
+  };
+  let rows = '';
+  for (let r = 0; r < 8; r++) rows += '<tr>' + (r % 4 === 0 ? cell(g1[r / 4], 4) : '') + (r % 2 === 0 ? cell(g2[r / 2], 2) : '') + cell(g3[r], 1) + '</tr>';
+  const about = [o.breed, o.birth ? 'Born ' + o.birth : '', o.chip ? 'Chip ' + o.chip : '', o.reg ? 'Reg ' + o.reg : ''].filter(Boolean).map(esc).join(' · ');
+  return `<h2 style="margin-top:0">${esc(o.name)}: pedigree</h2><small>${about}</small>
+    <div class="pedwrap"><table class="ped"><tr><th>Parents</th><th>Grandparents</th><th>Great-grandparents</th></tr>${rows}</table></div>
+    <p><small>Names are matched to the dogs in this app. To fill in more generations, add the ancestors as dogs (use status Outside for dogs you do not own) and set their sire and dam.</small></p>`;
+}
+function showPed(kind, i) { $('pedbody').innerHTML = pedHtml(pedSubject(kind, i)); $('ped').showModal(); }
+function printPed() {
+  $('sheet').innerHTML = $('pedbody').innerHTML;
+  $('ped').close();
+  setTimeout(() => window.print(), 50);
+}
+// ---------- PHOTOS (kept in IndexedDB so they never fill the main storage) ----------
+let photoDb = null;
+const photoCache = {};
+const uploadedPhotoIds = new Set();
+const PHOTO_BUCKET = 'dogcare-photos';
+function photoOpen() {
+  return photoDb ? Promise.resolve(photoDb) : new Promise((res, rej) => {
+    const r = indexedDB.open('dogcare-photos', 1);
+    r.onupgradeneeded = () => r.result.createObjectStore('p');
+    r.onsuccess = () => { photoDb = r.result; res(photoDb); };
+    r.onerror = () => rej(r.error);
+  });
+}
+function photoTx(mode, fn) {
+  return photoOpen().then(db => new Promise((res, rej) => {
+    const rq = fn(db.transaction('p', mode).objectStore('p'));
+    rq.onsuccess = () => res(rq.result);
+    rq.onerror = () => rej(rq.error);
+  }));
+}
+const photoPut = (id, url) => { photoCache[id] = url; return photoTx('readwrite', st => st.put(url, id)); };
+const photoDel = id => { delete photoCache[id]; uploadedPhotoIds.delete(id); return photoTx('readwrite', st => st.delete(id)); };
+async function photoGetLocal(id) {
+  if (photoCache[id]) return photoCache[id];
+  const url = await photoTx('readonly', st => st.get(id));
+  if (url) photoCache[id] = url;
+  return url || null;
+}
+function photoPath(id) { return currentUser.id + '/' + id + '.jpg'; }
+function blobDataUrl(blob) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(blob);
+  });
+}
+async function photoGet(id) {
+  const local = await photoGetLocal(id);
+  if (local || !currentUser || !navigator.onLine) return local;
+  const { data, error } = await supabaseClient.storage.from(PHOTO_BUCKET).download(photoPath(id));
+  if (error) {
+    if (error.message && /not found/i.test(error.message)) return null;
+    throw error;
+  }
+  const url = await blobDataUrl(data);
+  await photoPut(id, url);
+  uploadedPhotoIds.add(id);
+  return url;
+}
+const photoClear = () => {
+  Object.keys(photoCache).forEach(k => delete photoCache[k]);
+  uploadedPhotoIds.clear();
+  return photoTx('readwrite', st => st.clear());
+};
+async function syncReferencedPhotos() {
+  if (!currentUser || !navigator.onLine) return;
+  const ids = [...new Set([...dogs, ...puppies].map(item => item.photo).filter(Boolean))];
+  for (const id of ids) {
+    if (uploadedPhotoIds.has(id)) continue;
+    const url = await photoGetLocal(id);
+    if (!url) continue;
+    const blob = await fetch(url).then(response => response.blob());
+    const { error } = await supabaseClient.storage.from(PHOTO_BUCKET).upload(photoPath(id), blob, {
+      contentType: 'image/jpeg',
+      upsert: true
+    });
+    if (error) throw error;
+    uploadedPhotoIds.add(id);
+  }
+}
+async function flushPendingPhotoDeletes() {
+  if (!currentUser || !navigator.onLine) return;
+  const ids = JSON.parse(ls.getItem('pendingPhotoDeletes') || '[]');
+  if (!Array.isArray(ids) || !ids.length) return;
+  const { error } = await supabaseClient.storage.from(PHOTO_BUCKET).remove(ids.map(photoPath));
+  if (error) throw error;
+  ls.setItem('pendingPhotoDeletes', '[]');
+}
+function queuePhotoDelete(id) {
+  const ids = JSON.parse(ls.getItem('pendingPhotoDeletes') || '[]');
+  if (!ids.includes(id)) ids.push(id);
+  ls.setItem('pendingPhotoDeletes', JSON.stringify(ids));
+}
+function photoAll() {
+  return photoOpen().then(db => new Promise((res, rej) => {
+    const out = {}, rq = db.transaction('p', 'readonly').objectStore('p').openCursor();
+    rq.onsuccess = () => { const c = rq.result; if (c) { out[c.key] = c.value; c.continue(); } else res(out); };
+    rq.onerror = () => rej(rq.error);
+  }));
+}
+function hydratePhotos() {
+  document.querySelectorAll('img[data-photo]:not([src])').forEach(img => {
+    if (img.dataset.loading) return;
+    img.dataset.loading = '1';
+    photoGet(img.dataset.photo).then(url => {
+      if (url && img.isConnected) img.src = url;
+    }).catch(error => {
+      console.error('Dog Care Manager: photo could not be loaded.', error);
+      setSyncStatus('A photo could not be loaded. It will retry when connected.', false, false);
+    }).finally(() => {
+      delete img.dataset.loading;
+    });
+  });
+}
+function avatar(o, big) {
+  const cls = 'av' + (big ? ' big' : '');
+  return o.photo ? `<img class="${cls}" data-photo="${o.photo}" ${photoCache[o.photo] ? 'src="' + photoCache[o.photo] + '"' : ''} alt="">` : `<span class="${cls}">🐾</span>`;
+}
+function photoBox(kind, i, o) {
+  return `<div class="acts" style="margin-top:10px;align-items:center">${avatar(o, true)}
+    <label class="btn s" style="cursor:pointer">${o.photo ? 'Change photo' : 'Add photo'}<input type="file" accept="image/*" style="display:none" onchange="setPhoto('${kind}', ${i}, this.files[0])"></label>
+    ${o.photo ? `<button class="btn d" onclick="delPhoto('${kind}', ${i})">Remove photo</button>` : ''}</div>`;
+}
+function shrinkPhoto(file) {                                    // max 640 px, JPEG, so each photo is small
+  return new Promise((res, rej) => {
+    const img = new Image(), url = URL.createObjectURL(file);
+    img.onload = () => {
+      const k = Math.min(1, 640 / Math.max(img.width, img.height)), c = document.createElement('canvas');
+      c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(url);
+      res(c.toDataURL('image/jpeg', 0.82));
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); rej(new Error('bad image')); };
+    img.src = url;
+  });
+}
+function setPhoto(kind, i, file) {
+  if (!file) return;
+  const o = (kind === 'Dog' ? dogs : puppies)[i];
+  shrinkPhoto(file).then(url => {
+    const id = o.photo || 'ph' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+    return photoPut(id, url).then(() => {
+      uploadedPhotoIds.delete(id);
+      o.photo = id;
+      save();
+      render();
+    });
+  }).catch(error => {
+    console.error('Dog Care Manager: photo could not be saved locally.', error);
+    alert('Could not save that photo. Check available device storage and try again.');
+  });
+}
+function delPhoto(kind, i) {
+  const o = (kind === 'Dog' ? dogs : puppies)[i];
+  if (!o.photo || !confirm('Remove this photo?')) return;
+  const id = o.photo;
+  o.photo = '';
+  queuePhotoDelete(id);
+  photoDel(id).catch(error => {
+    console.error('Dog Care Manager: local photo cache could not be removed.', error);
+    setSyncStatus('Photo removed from the record, but its local copy could not be cleared.');
+  });
+  save(); render();
+}
+// ---------- GO-HOME SHEET AS A PDF FILE (no library needed) ----------
+function pdfBlob(pages) {
+  const esc = s => String(s).replace(/[‘’]/g, "'").replace(/[^\x20-\xFF]/g, '?').replace(/([\\()])/g, '\\$1');
+  const objs = [], n = pages.length;
+  objs[1] = '<< /Type /Catalog /Pages 2 0 R >>';
+  objs[2] = `<< /Type /Pages /Kids [${pages.map((_, k) => (6 + 2 * k) + ' 0 R').join(' ')}] /Count ${n} >>`;
+  objs[3] = '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>';
+  objs[4] = '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>';
+  pages.forEach((ops, k) => {
+    const stream = ops.map(o => `BT /F${o.bold ? 2 : 1} ${o.size} Tf ${o.x} ${o.y} Td (${esc(o.s)}) Tj ET`).join('\n');
+    objs[5 + 2 * k] = `<< /Length ${stream.length} >>\nstream\n${stream}\nendstream`;
+    objs[6 + 2 * k] = `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents ${5 + 2 * k} 0 R >>`;
+  });
+  let out = '%PDF-1.4\n';
+  const offs = [];
+  for (let id = 1; id < objs.length; id++) { offs[id] = out.length; out += `${id} 0 obj\n${objs[id]}\nendobj\n`; }
+  const xref = out.length;
+  out += `xref\n0 ${objs.length}\n0000000000 65535 f \n` + offs.slice(1).map(o => String(o).padStart(10, '0') + ' 00000 n \n').join('');
+  out += `trailer\n<< /Size ${objs.length} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF`;
+  const bytes = new Uint8Array(out.length);
+  for (let k = 0; k < out.length; k++) bytes[k] = out.charCodeAt(k) & 255;
+  return new Blob([bytes], { type: 'application/pdf' });
+}
+function pupPdf(i) {
+  const p = puppies[i];
+  const who = prompt('Your name and phone number to show on the sheet (leave blank to skip)', ls.getItem('breederInfo') || '');
+  if (who === null) return;
+  ls.setItem('breederInfo', who.trim());
+  const H = 842, M = 50, W = 495;
+  let page = [], pages = [page], y = H - M;
+  const wrap = (t, n) => { const out = []; let cur = ''; String(t).split(/\s+/).forEach(w => { if (cur && (cur + ' ' + w).length > n) { out.push(cur); cur = w; } else cur = (cur + ' ' + w).trim(); }); out.push(cur); return out; };
+  const row = (cols, size) => {                                  // cols: [x, width, text, bold]
+    const ls2 = cols.map(c => wrap(c[2], Math.max(4, Math.floor(c[1] / (size * 0.52)))));
+    const n = Math.max(...ls2.map(a => a.length));
+    if (y - n * (size + 3) < M) { page = []; pages.push(page); y = H - M; }
+    for (let k = 0; k < n; k++) { y -= size + 3; cols.forEach((c, ci) => { if (ls2[ci][k]) page.push({ x: c[0], y: y, size: size, bold: !!c[3], s: ls2[ci][k] }); }); }
+    y -= 2;
+  };
+  const sec = (t, widths, head, rows) => {
+    if (!rows.length) return;
+    y -= 8; row([[M, W, t, true]], 12);
+    const xs = widths.map((_, k) => M + widths.slice(0, k).reduce((a, b) => a + b, 0));
+    row(head.map((h, k) => [xs[k], widths[k] - 6, h, true]), 10);
+    rows.forEach(r => row(r.map((c, k) => [xs[k], widths[k] - 6, String(c)]), 10));
+  };
+  const mom = dogs.find(d => d.name === p.mother), lit = mom && mom.births.find(b => b.date === p.birth);
+  const byDate = (a, b) => a.date.localeCompare(b.date);
+  row([[M, W, 'Puppy go-home record', true]], 18);
+  if (who.trim()) row([[M, W, who.trim()]], 11);
+  row([[M, W, 'Printed ' + today()]], 9);
+  y -= 6; row([[M, W, 'About ' + p.name, true]], 12);
+  [['Breed', p.breed], ['Sex', p.sex === 'f' ? 'Female' : 'Male'], ['Date of birth', p.birth], ['Color / markings', p.color],
+   ['Microchip number', p.chip], ['Registered name', p.regname], ['Registration number', p.reg], ['Mother', p.mother],
+   ['Father', lit && lit.sire], ['Buyer', p.buyer], ['Buyer phone', p.phone]]
+    .filter(r => r[1]).forEach(r => row([[M, 150, r[0], true], [M + 160, W - 160, r[1]]], 10));
+  sec('Vaccinations', [80, 170, 80, 165], ['Date', 'Vaccine', 'Next due', 'Note'], p.vax.slice().sort(byDate).map(v => [v.date, v.name, v.next || '', v.note || '']));
+  sec('Deworming and early care', [90, 405], ['Date', 'What was done'], PUP.filter(m => p.done[m.k]).map(m => [p.done[m.k], m.l]));
+  sec('Weight history', [90, 90, 315], ['Date', 'Weight', 'Note'], p.weights.slice().sort(byDate).map(w => [w.date, w.g + ' g', w.k === 'birth' ? 'Birth weight' : (w.note || '')]));
+  sec('Vet and health records', [80, 320, 95], ['Date', 'What', 'Type'], p.health.slice().sort(byDate).map(r => [r.date, r.title + (r.result ? ' - ' + r.result : ''), r.kind]));
+  y -= 8; row([[M, W, 'Notes for the new owner', true]], 12);
+  y -= 70;
+  row([[M, 240, 'Breeder signature: ______________'], [M + 255, 240, 'Buyer signature: ______________']], 10);
+  y -= 6; row([[M, W, "Dates and weights come from the breeder's records. Follow your vet's advice for vaccines, deworming and feeding."]], 9);
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(pdfBlob(pages));
+  a.download = (p.name || 'puppy').replace(/[^\w-]+/g, '_') + '-go-home-sheet.pdf';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+}
+// ---------- PRINTABLE GO-HOME SHEET ----------
+function printPup(i) {
+  const p = puppies[i];
+  const who = prompt('Your name and phone number to show on the sheet (leave blank to skip)', ls.getItem('breederInfo') || '');
+  if (who === null) return;
+  ls.setItem('breederInfo', who.trim());
+  const mom = dogs.find(d => d.name === p.mother), lit = mom && mom.births.find(b => b.date === p.birth);
+  const row = (k, v) => v ? `<tr><td>${k}</td><td>${esc(v)}</td></tr>` : '';
+  const byDate = (a, b) => a.date.localeCompare(b.date);
+  const wts = p.weights.slice().sort(byDate).map(w => `<tr><td>${w.date}</td><td>${w.g} g</td><td>${esc(w.k === 'birth' ? 'Birth weight' : (w.note || ''))}</td></tr>`).join('');
+  const vx = p.vax.slice().sort(byDate).map(v => `<tr><td>${v.date}</td><td>${esc(v.name)}</td><td>${v.next || ''}</td><td>${esc(v.note || '')}</td></tr>`).join('');
+  const ms = PUP.filter(m => p.done[m.k]).map(m => `<tr><td>${p.done[m.k]}</td><td>${esc(m.l)}</td></tr>`).join('');
+  const hl = p.health.slice().sort(byDate).map(r => `<tr><td>${r.date}</td><td>${esc(r.title)}${r.result ? '<br><small>' + esc(r.result) + '</small>' : ''}</td><td>${r.kind}</td></tr>`).join('');
+  const sec = (t, head, body) => body ? `<h3>${t}</h3><table><tr>${head}</tr>${body}</table>` : '';
+  $('sheet').innerHTML = `<h2>Puppy go-home record</h2>${who.trim() ? `<div>${esc(who.trim())}</div>` : ''}<small>Printed ${today()}</small>
+    <h3>About ${esc(p.name)}</h3><table class="id">
+      ${row('Breed', p.breed)}${row('Sex', p.sex === 'f' ? 'Female' : 'Male')}${row('Date of birth', p.birth)}${row('Color / markings', p.color)}
+      ${row('Microchip number', p.chip)}${row('Registered name', p.regname)}${row('Registration number', p.reg)}
+      ${row('Mother', p.mother)}${row('Father', lit && lit.sire)}${row('Buyer', p.buyer)}${row('Buyer phone', p.phone)}</table>
+    ${sec('Vaccinations', '<th>Date</th><th>Vaccine</th><th>Next due</th><th>Note</th>', vx)}
+    ${sec('Deworming and early care', '<th>Date</th><th>What was done</th>', ms)}
+    ${sec('Weight history', '<th>Date</th><th>Weight</th><th>Note</th>', wts)}
+    ${sec('Vet and health records', '<th>Date</th><th>What</th><th>Type</th>', hl)}
+    <h3>Notes for the new owner</h3><div style="height:90pt"></div>
+    <div class="sig"><div>Breeder signature and date</div><div>Buyer signature and date</div></div>
+    <p><small>Dates and weights come from the breeder's records. Follow your vet's advice for vaccines, deworming and feeding.</small></p>`;
+  setTimeout(() => window.print(), 50);
+}
+function setIv(i, k, v) {
+  const t = dogs[i].tasks.find(x => x.k === k), n = parseInt(v, 10);
+  if (n > 0) t.iv = n; else delete t.iv;                  // blank goes back to the built-in rule
+  save(); render();
+}
+function addTask(i) {
+  const name = $('ct-' + i).value.trim(), n = parseInt($('ci-' + i).value, 10);
+  if (!name || !(n > 0)) { alert('Enter a task name and how many days between each time'); return; }
+  dogs[i].tasks.push({ k: 'c' + Date.now().toString(36), custom: true, label: name, iv: n, last: '' });
+  save(); render();
+}
+function delTask(i, k) {
+  if (!confirm('Remove this task?')) return;
+  dogs[i].tasks = dogs[i].tasks.filter(t => t.k !== k);
+  save(); render();
+}
+function done(i, k) {
+  const dog = dogs[i];
+  dog.tasks.find(t => t.k === k).last = today();
+  if (k === 'heat' && !dog.heats.some(h => h.start === today())) dog.heats.push({ start: today(), note: '' });
+  save(); render();
+}
+function setLast(i, k, v) { dogs[i].tasks.find(t => t.k === k).last = v; save(); render(); }
+
+function renderDogs() {
+  const open = openKeys('app');
+  let html = '';
+  dogs.forEach((dog, i) => {
+    if (!dogShown(dog)) return;
+    const lefts = dog.tasks.filter(t => t.last).map(t => diff(today(), addDays(t.last, interval(dog, t))));
+    const overdue = lefts.filter(l => l < 0).length;
+    let sb;
+    if (overdue) sb = ['over', overdue + ' overdue'];
+    else if (lefts.length) sb = badge(Math.min(...lefts));
+    else sb = ['none', 'No dates'];
+    if (gone(dog)) sb = ['none', dog.status];
+
+    html += `<details${gone(dog) ? ' style="opacity:.65"' : ''} data-key="${esc(dog.name + '|' + dog.birth)}">
+      <summary><div class="top">
+        <span><span class="chev">▸</span>${avatar(dog)}<b>${esc(dog.name)}</b>${dog.breed ? ' <small>· ' + esc(dog.breed) + '</small>' : ''}<br>
+          <small>${dog.sex === 'f' ? 'Female' : 'Male'} · ${ageText(dog.birth)}${dog.status !== 'Active' ? ' · ' + dog.status : ''}${dog.mated && !gone(dog) ? ' · pregnant?' : ''}</small></span>
+        <span class="badge ${sb[0]}">${sb[1]}</span>
+      </div></summary>
+      <div style="margin-top:8px">
+        <label><small>Breed</small></label>
+        <input value="${esc(dog.breed)}" placeholder="e.g. Labrador" onchange="setDog(${i}, 'breed', this.value)">
+        <label style="display:block;margin-top:8px"><small>Status</small></label>
+        <select onchange="setDogStatus(${i}, this.value)">${DSTAT.map(x => `<option ${dog.status === x ? 'selected' : ''}>${x}</option>`).join('')}</select>
+        <div class="grid" style="margin-top:8px">${idFields('Dog', i, dog)}</div>
+        <div class="grid" style="margin-top:8px">
+          <div><label><small>Sire (father)</small></label><input list="dn-${i}" value="${esc(dog.sire || '')}" onchange="setDog(${i}, 'sire', this.value)"></div>
+          <div><label><small>Dam (mother)</small></label><input list="dn-${i}" value="${esc(dog.dam || '')}" onchange="setDog(${i}, 'dam', this.value)"></div>
+          <div class="w"><button class="btn s" onclick="showPed('Dog', ${i})">View pedigree</button></div>
+        </div>
+        <datalist id="dn-${i}">${dogs.map(d => `<option value="${esc(d.name)}">`).join('')}</datalist>${photoBox('Dog', i, dog)}`;
+    dog.tasks.forEach(t => {
+      let b = ['none', 'No date'], due = 'Set the last-done date below';
+      if (t.last) {
+        const d = addDays(t.last, interval(dog, t));
+        b = badge(diff(today(), d));
+        due = 'Next due ' + d + ' (every ~' + interval(dog, t) + ' days)';
+      }
+      const isDeworm = t.k === 'deworm';
+      html += `<div class="task"><div class="top"><span>${esc(taskLabel(t))}</span>
+        <span class="badge ${b[0]}">${b[1]}</span></div><small>${due}</small>
+        ${isDeworm ? `<div class="acts"><input type="number" step="0.01" min="0" inputmode="decimal" id="dwk-${i}" placeholder="Weight now in kg (optional)"></div>` : ''}
+        <div class="acts"><input type="date" value="${t.last}" onchange="setLast(${i}, '${t.k}', this.value)">
+        <button class="btn s" onclick="${isDeworm ? `doneDeworm(${i})` : `done(${i}, '${t.k}')`}">Done today</button></div>
+        <div class="acts"><input type="number" min="1" inputmode="numeric" value="${t.iv || ''}" placeholder="Repeats every ${baseInterval(dog, t)} days (type to change)" aria-label="Repeat every this many days" onchange="setIv(${i}, '${t.k}', this.value)">${t.custom ? `<button class="btn d" onclick="delTask(${i}, '${t.k}')">Remove</button>` : ''}</div></div>`;
+    });
+    html += `<div class="acts" style="margin-top:10px"><input id="ct-${i}" placeholder="New task, e.g. Tick dip">
+      <input id="ci-${i}" type="number" min="1" inputmode="numeric" placeholder="Days" style="max-width:84px"><button class="btn s" onclick="addTask(${i})">Add task</button></div>`;
+    html += weightHtml(i, dog);
+    html += vaxHtml('d', i, dog.vax);
+    html += healthHtml(i, dog);
+    if (dog.sex === 'f') html += birthsHtml(i, dog);
+    html += `<div style="margin-top:10px"><button class="btn d" onclick="delDog(${i})">Remove ${esc(dog.name)}</button></div>
+      </div></details>`;
+  });
+  $('app').innerHTML = html || '<p class="mut">No dogs yet. Add one above.</p>';
+  restoreOpen('app', open);
+}
+
+// ---------- PUPPIES ----------
+function addPuppy() {
+  const name = $('pname').value.trim(), birth = $('pbirth').value;
+  if (!name || !birth) { alert('Enter a puppy name and birth date'); return; }
+  const bw = parseFloat($('pbw').value);
+  puppies.push({ name: name, breed: $('pbreed').value.trim(), sex: $('psex').value, birth: birth,
+                 mother: $('pmother').value.trim(), status: 'Available', buyer: '', price: 0, done: {}, vax: [],
+                 weights: bw > 0 ? [{ date: birth, g: bw, k: 'birth', note: '' }] : [] });
+  $('pname').value = ''; $('pbw').value = '';
+  save(); render();
+}
+// tick or untick a milestone; a weight typed next to it is recorded with the date
+function togglePup(i, k) {
+  const p = puppies[i];
+  if (p.done[k]) {
+    delete p.done[k];
+  } else {
+    p.done[k] = today();
+    const input = $('mw-' + i + '-' + k), g = input ? parseFloat(input.value) : 0;
+    if (g > 0) p.weights.push({ date: today(), g: g, k: k, note: '' });
+  }
+  save(); render();
+}
+// one-line payment status for a puppy card
+function payLine(p) {
+  if (p.status !== 'Reserved' && p.status !== 'Sold' && !p.deposit) return '';
+  if (p.paidDate) return `<span class="badge ok">Paid in full ${p.paidDate}</span>`;
+  if (!p.price && !p.deposit) return '';
+  const bal = Math.max(p.price - (p.deposit || 0), 0);
+  if (p.price && bal === 0) return '<span class="badge ok">Fully paid</span>';
+  if (!p.deposit) return `<span class="badge soon">No deposit yet · ${M(p.price)} due</span>`;
+  return `<span class="badge soon">Balance due ${M(bal)}</span> <small>Deposit ${M(p.deposit)}${p.depositDate ? ' on ' + p.depositDate : ''}</small>`;
+}
+function setPup(i, f, v) {
+  puppies[i][f] = (f === 'price' || f === 'deposit') ? (parseFloat(v) || 0) : (['breed', 'chip', 'reg', 'regname', 'color', 'phone'].includes(f) ? v.trim() : v);
+  save(); render();
+}
+function addPupWeight(i) {
+  const id = 'p' + i, g = parseFloat($('pk-' + id).value), date = $('pd-' + id).value;
+  if (!(g > 0) || !date) { alert('Enter the weight in grams and the date'); return; }
+  puppies[i].weights.push({ date: date, g: g, k: '', note: $('pn-' + id).value.trim() });
+  save(); render();
+}
+function delPupWeight(i, j) {
+  if (!confirm('Delete this weight record?')) return;
+  puppies[i].weights.splice(j, 1);
+  save(); render();
+}
+function delPuppy(i) {
+  if (!confirm('Remove this puppy?')) return;
+  if (puppies[i].photo) photoDel(puppies[i].photo);
+  puppies.splice(i, 1); save(); render();
+}
+function keepAsDog(i) {
+  const p = puppies[i];
+  if (!confirm('Move ' + p.name + ' to your adult dogs now? Puppy milestones will be removed, but weights and vaccines are kept.')) return;
+  dogs.push(toDog(p)); puppies.splice(i, 1);
+  save(); render();
+}
+function pupWeightHtml(i, p) {
+  const id = 'p' + i;
+  const asc = p.weights.map((w, j) => ({ w: w, j: j })).sort((a, b) => a.w.date.localeCompare(b.w.date) || a.j - b.j);
+  let summary = '<small>No weights yet. Record the birth weight below, or type a weight next to a milestone and tick it.</small>', rows = '';
+  if (asc.length) {
+    const first = asc[0].w, last = asc[asc.length - 1].w;
+    summary = `<b>${fmt(last.g)} g</b> <small>on ${last.date}</small>`;
+    if (asc.length > 1) {
+      const prev = asc[asc.length - 2].w, d1 = last.g - prev.g, d0 = last.g - first.g;
+      const days = diff(first.date, last.date);
+      summary += `<br><small>Since previous weigh-in: <b class="${d1 < 0 ? 'over' : 'ok'}">${sgn(d1)} g</b>
+        · Since first record: ${sgn(d0)} g${days > 0 ? ' (about ' + sgn(d0 / days) + ' g per day)' : ''}</small>`;
+      if (d1 < 0) summary += '<br><small class="over">Puppies are normally expected to gain weight. If this puppy has lost weight or is not gaining, contact your vet.</small>';
+    }
+    rows = asc.slice().reverse().map((a, n, arr) => {
+      const older = arr[n + 1];
+      const d = older ? a.w.g - older.w.g : null;
+      const m = PUP.find(x => x.k === a.w.k);
+      const at = a.w.k === 'birth' ? ' · at birth' : (m ? ' · at ' + m.l : '');
+      return `<div class="row"><div class="g"><b>${fmt(a.w.g)} g</b>
+        <small>· ${a.w.date}${at}${a.w.note ? ' · ' + esc(a.w.note) : ''}</small>
+        ${d !== null ? `<br><small class="${d < 0 ? 'over' : 'ok'}">${sgn(d)} g</small>` : ''}</div>
+        <button class="btn d" onclick="delPupWeight(${i}, ${a.j})">Delete</button></div>`;
+    }).join('');
+  }
+  return `<h3>Weight</h3>
+    <p><small>Weigh puppies from birth and at each milestone. Steady gain is the sign they are doing well.</small></p>
+    <div>${summary}</div>
+    ${weightChart(asc.map(a => ({ date: a.w.date, v: a.w.g, mark: !!a.w.k })), 'g', 'Filled dots = weighed at birth or a milestone.')}${rows}
+    <div class="grid" style="margin-top:8px">
+      <div><label><small>Weight (g)</small></label><input type="number" step="1" min="0" inputmode="numeric" id="pk-${id}"></div>
+      <div><label><small>Date</small></label><input type="date" id="pd-${id}" value="${today()}"></div>
+      <div class="w"><label><small>Note (optional)</small></label><input id="pn-${id}"></div>
+      <div class="w"><button class="btn s" style="width:100%" onclick="addPupWeight(${i})">Record weight</button></div>
+    </div>`;
+}
+
+function renderPuppies() {
+  const open = openKeys('pups');
+  const sold = puppies.filter(p => p.status === 'Sold');
+  const income = sold.reduce((s, p) => s + p.price, 0);
+  const owed = puppies.filter(p => (p.status === 'Sold' || p.status === 'Reserved') && !p.paidDate)
+                      .reduce((s, p) => s + Math.max(p.price - (p.deposit || 0), 0), 0);
+  let html = puppies.length
+    ? `<p><small>${puppies.length} puppies · ${puppies.filter(p => p.status === 'Available').length} available · ${sold.length} sold (${M(income)})${owed ? ' · ' + M(owed) + ' still to collect' : ''}</small></p>`
+    : '<p class="mut">No puppies yet. Add one above.</p>';
+
+  puppies.forEach((p, i) => {
+    if (!pupShown(p)) return;
+    const weeks = Math.floor(diff(p.birth, today()) / 7);
+    const next = p.status === 'Deceased' ? null : PUP.find(m => !p.done[m.k]);
+    const nextText = next ? `Next: ${next.l}, ${badge(diff(today(), addDays(p.birth, next.d)))[1]}` : (p.status === 'Deceased' ? 'No reminders' : 'All milestones done');
+    const gradText = p.status === 'Deceased' ? 'Record kept for litter history. No reminders.' : (p.status === 'Sold' || p.status === 'Reserved')
+      ? 'Stays in Puppies while ' + p.status.toLowerCase()
+      : 'Becomes an adult dog on ' + addDays(p.birth, Math.round(adultM * 30.44));
+    const opts = ['Available', 'Reserved', 'Sold', 'Kept', 'Deceased'].map(s => `<option ${p.status === s ? 'selected' : ''}>${s}</option>`).join('');
+    const latest = p.weights.slice().sort((a, b) => a.date.localeCompare(b.date)).pop();
+    const rows = PUP.map(m => {
+      const due = addDays(p.birth, m.d);
+      const w = p.weights.find(x => x.k === m.k);
+      const info = p.done[m.k]
+        ? 'done ' + p.done[m.k] + (w ? ' · weighed ' + fmt(w.g) + ' g' : '')
+        : 'due ' + due + ' (' + badge(diff(today(), due))[1] + ')';
+      return `<div class="ms"><div class="top"><label><input type="checkbox" ${p.done[m.k] ? 'checked' : ''}
+              onchange="togglePup(${i}, '${m.k}')"> ${m.l}<br><small>${info}</small></label>
+              ${p.done[m.k] ? '' : `<input type="number" step="1" min="0" inputmode="numeric" id="mw-${i}-${m.k}" placeholder="g" aria-label="Weight in grams">`}</div></div>`;
+    }).join('');
+
+    html += `<details data-key="${esc(p.name + '|' + p.birth + '|' + p.mother)}"><summary>
+      <span class="chev">▸</span>${avatar(p)}<b>${esc(p.name)}</b>${p.breed ? ' <small>· ' + esc(p.breed) + '</small>' : ''}
+      <small>· ${p.sex === 'f' ? 'female' : 'male'} · ${weeks} weeks · ${p.status}${latest ? ' · ' + fmt(latest.g) + ' g' : ''}</small><br>
+      <small>${nextText}</small></summary>
+      <p><small>${p.mother ? 'Mother: ' + esc(p.mother) + ' · ' : ''}Born ${p.birth}<br>${gradText}</small></p>
+      <div class="grid">
+        <div><label><small>Status</small></label><select onchange="setPup(${i}, 'status', this.value)">${opts}</select></div>
+        <div><label><small>Price</small></label><input type="number" step="0.01" value="${p.price || ''}" onchange="setPup(${i}, 'price', this.value)"></div>
+        <div><label><small>Breed</small></label><input value="${esc(p.breed)}" onchange="setPup(${i}, 'breed', this.value)"></div>
+        ${idFields('Pup', i, p)}
+        <div class="w">${photoBox('Pup', i, p)}</div>
+        <div><label><small>Buyer</small></label><input value="${esc(p.buyer)}" onchange="setPup(${i}, 'buyer', this.value)"></div>
+        <div><label><small>Buyer phone</small></label><input type="tel" value="${esc(p.phone || '')}" onchange="setPup(${i}, 'phone', this.value)"></div>
+        <div><label><small>Deposit received</small></label><input type="number" step="0.01" min="0" inputmode="decimal" value="${p.deposit || ''}" onchange="setPup(${i}, 'deposit', this.value)"></div>
+        <div><label><small>Deposit date</small></label><input type="date" value="${p.depositDate || ''}" onchange="setPup(${i}, 'depositDate', this.value)"></div>
+        <div><label><small>Balance paid on</small></label><input type="date" value="${p.paidDate || ''}" onchange="setPup(${i}, 'paidDate', this.value)"></div>
+        <div class="w">${payLine(p)}</div>
+      </div>
+      <h3>Milestones</h3>
+      <p><small>To record a weight with a milestone, type it in the grams box first, then tick the milestone.</small></p>${rows}
+      ${pupWeightHtml(i, p)}
+      ${vaxHtml('p', i, p.vax)}
+      ${healthPupHtml(i, p)}<div class="btns" style="margin-top:12px">
+        ${p.status === 'Kept' ? `<button class="btn s" onclick="keepAsDog(${i})">Move to adult dogs now</button>` : ''}
+        <button class="btn s" onclick="showPed('Pup', ${i})">View pedigree</button>
+        <button class="btn s" onclick="pupPdf(${i})">Download sheet (PDF)</button>
+        <button class="btn s" onclick="printPup(${i})">Print</button>
+        <button class="btn d" onclick="delPuppy(${i})">Remove puppy</button></div>
+    </details>`;
+  });
+  $('pups').innerHTML = html;
+  restoreOpen('pups', open);
+}
+
+// ---------- LITTERS ----------
+// a litter = same mother + same birth date; puppies that grew into adult dogs still count
+function litters() {
+  const map = {};
+  const get = (mother, birth) => {
+    const key = (mother || '') + '|' + birth;
+    if (!map[key]) map[key] = { key: key, mother: mother || 'Unknown mother', birth: birth, pups: [], adults: [] };
+    return map[key];
+  };
+  puppies.forEach(p => get(p.mother, p.birth).pups.push(p));
+  dogs.forEach(d => {
+    if (!d.fromLitter) return;
+    const n = d.fromLitter.lastIndexOf('|');
+    get(d.fromLitter.slice(0, n), d.fromLitter.slice(n + 1)).adults.push(d);
+  });
+  return Object.values(map).map(l => { l.label = l.mother + ', born ' + l.birth; return l; })
+    .sort((a, b) => b.birth.localeCompare(a.birth));
+}
+// ---------- SEARCH, FILTERS AND CSV EXPORT ----------
+function dogShown(d) {
+  const q = $('dq').value.trim().toLowerCase(), f = $('dfilter').value;
+  if (f === 'current' && gone(d)) return false;
+  if (f === 'former' && !gone(d)) return false;
+  return !q || [d.name, d.breed, d.chip, d.reg, d.regname, d.color, d.sire, d.dam, d.status].join(' ').toLowerCase().includes(q);
+}
+function pupShown(p) {
+  const q = $('pq').value.trim().toLowerCase(), f = $('pfilter').value;
+  if (f !== 'all' && p.status !== f) return false;
+  return !q || [p.name, p.breed, p.chip, p.reg, p.regname, p.color, p.mother, p.buyer, p.phone, p.status].join(' ').toLowerCase().includes(q);
+}
+function updateCounts() {
+  $('dcount').textContent = ($('dq').value.trim() || $('dfilter').value !== 'all') ? 'Showing ' + dogs.filter(dogShown).length + ' of ' + dogs.length + ' dogs' : '';
+  $('pcount').textContent = ($('pq').value.trim() || $('pfilter').value !== 'all') ? 'Showing ' + puppies.filter(pupShown).length + ' of ' + puppies.length + ' puppies' : '';
+}
+function csvCell(v) { v = v == null ? '' : String(v); return /[",\r\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }
+function exportCsv(what) {
+  const taskLast = (d, k) => (d.tasks.find(t => t.k === k) || {}).last || '';
+  const forLabel = f => !f ? '' : (f.startsWith('litter:') ? 'Litter of ' : '') + f.replace(/^(dog|litter):/, '').split('|')[0];
+  let head, rows;
+  if (what === 'dogs') {
+    head = ['Name', 'Status', 'Sex', 'Breed', 'Birth date', 'Color', 'Microchip', 'Registration no.', 'Registered name', 'Sire', 'Dam', 'Latest mating', 'Latest vet record']
+      .concat(TPL.map(t => t.l + ' (last done)'));
+    rows = dogs.map(d => [d.name, d.status, d.sex === 'f' ? 'Female' : 'Male', d.breed, d.birth, d.color, d.chip, d.reg, d.regname, d.sire, d.dam, d.mated,
+      d.health.map(h => h.date).sort().pop() || ''].concat(TPL.map(t => taskLast(d, t.k))));
+  } else if (what === 'puppies') {
+    head = ['Name', 'Status', 'Sex', 'Breed', 'Birth date', 'Mother', 'Color', 'Microchip', 'Registration no.', 'Registered name', 'Price', 'Deposit', 'Deposit date', 'Balance due', 'Balance paid on', 'Buyer', 'Buyer phone'];
+    rows = puppies.map(p => [p.name, p.status, p.sex === 'f' ? 'Female' : 'Male', p.breed, p.birth, p.mother, p.color, p.chip, p.reg, p.regname, p.price, p.deposit, p.depositDate,
+      (p.status === 'Sold' || p.status === 'Reserved') ? (p.paidDate ? 0 : Math.max(p.price - (p.deposit || 0), 0)) : '', p.paidDate, p.buyer, p.phone]);
+  } else if (what === 'expenses') {
+    head = ['Date', 'Amount', 'Category', 'For', 'Note'];
+    rows = expenses.slice().sort((a, b) => (a.date || '').localeCompare(b.date || '')).map(e => [e.date, e.amt, e.cat, forLabel(e.for), e.note]);
+  } else {
+    head = ['Position', 'Name', 'Phone', 'Wants', 'Sex preference', 'Color preference', 'Deposit', 'Deposit date', 'Status', 'Puppy chosen', 'Notes', 'Added'];
+    rows = waitlist.map((w, i) => [i + 1, w.name, w.phone, w.wants, w.sex === 'm' ? 'Male' : w.sex === 'f' ? 'Female' : 'No preference', w.color, w.deposit, w.depositDate, w.status, w.puppy.split('|')[0], w.note, w.added]);
+  }
+  if (!rows.length) { alert('Nothing to export yet.'); return; }
+  const text = '\ufeff' + [head].concat(rows).map(r => r.map(csvCell).join(',')).join('\r\n');
+  download('dog-care-' + what + '-' + today() + '.csv', text, 'text/csv;charset=utf-8');
+}
+// ---------- WAITLIST ----------
+const WSTAT = ['Waiting', 'Offered', 'Matched', 'Declined'];
+const pkey = p => p.name + '|' + p.birth + '|' + (p.mother || '');
+function normWait() {
+  waitlist = (Array.isArray(waitlist) ? waitlist : []).filter(w => w && w.name);
+  waitlist.forEach(w => {
+    w.id = w.id || 'w' + Math.random().toString(36).slice(2, 8);
+    w.deposit = Number(w.deposit) || 0; w.status = w.status || 'Waiting'; w.sex = w.sex || 'any';
+    ['phone', 'color', 'wants', 'note', 'depositDate', 'puppy', 'added'].forEach(k => { w[k] = w[k] || ''; });
+  });
+}
+function renderWaitlist() {
+  const open = waitlist.filter(w => w.status === 'Waiting' || w.status === 'Offered');
+  const held = open.reduce((s, w) => s + (w.deposit || 0), 0);
+  let html = `<h2>Waitlist</h2><p><small>${open.length} waiting${held ? ' · ' + M(held) + ' in deposits held' : ''}</small></p>`;
+  if (!waitlist.length) html += '<div class="card"><small>No one on the waitlist yet. Add a name below.</small></div>';
+  waitlist.forEach((w, i) => {
+    const sopts = WSTAT.map(x => `<option ${w.status === x ? 'selected' : ''}>${x}</option>`).join('');
+    const xopts = [['any', 'No preference'], ['m', 'Male'], ['f', 'Female']].map(x => `<option value="${x[0]}" ${w.sex === x[0] ? 'selected' : ''}>${x[1]}</option>`).join('');
+    const popts = '<option value="">Not chosen</option>' + puppies.filter(p => p.status !== 'Deceased').map(p =>
+      `<option value="${esc(pkey(p))}" ${w.puppy === pkey(p) ? 'selected' : ''}>${esc(p.name)} (${esc(p.mother || 'litter')}, ${p.birth})</option>`).join('');
+    const cls = w.status === 'Matched' ? 'ok' : w.status === 'Declined' ? 'none' : 'soon';
+    html += `<details data-key="w-${w.id}"><summary class="top">
+      <span><span class="chev">▸</span><b>${i + 1}. ${esc(w.name)}</b>${w.wants ? ' <small>· ' + esc(w.wants) + '</small>' : ''}</span>
+      <span class="badge ${cls}">${w.status}${w.deposit ? ' · ' + M(w.deposit) : ''}</span></summary>
+      <div class="grid" style="margin-top:8px">
+        <div><label><small>Name</small></label><input value="${esc(w.name)}" onchange="setWait(${i}, 'name', this.value)"></div>
+        <div><label><small>Phone</small></label><input type="tel" value="${esc(w.phone)}" onchange="setWait(${i}, 'phone', this.value)"></div>
+        <div class="w"><label><small>Wants (breed or litter)</small></label><input value="${esc(w.wants)}" placeholder="e.g. next Labrador litter" onchange="setWait(${i}, 'wants', this.value)"></div>
+        <div><label><small>Sex preference</small></label><select onchange="setWait(${i}, 'sex', this.value)">${xopts}</select></div>
+        <div><label><small>Color preference</small></label><input value="${esc(w.color)}" onchange="setWait(${i}, 'color', this.value)"></div>
+        <div><label><small>Deposit paid</small></label><input type="number" step="0.01" min="0" inputmode="decimal" value="${w.deposit || ''}" onchange="setWait(${i}, 'deposit', this.value)"></div>
+        <div><label><small>Deposit date</small></label><input type="date" value="${w.depositDate}" onchange="setWait(${i}, 'depositDate', this.value)"></div>
+        <div><label><small>Status</small></label><select onchange="setWait(${i}, 'status', this.value)">${sopts}</select></div>
+        <div><label><small>Puppy chosen</small></label><select onchange="setWait(${i}, 'puppy', this.value)">${popts}</select></div>
+        <div class="w"><label><small>Notes</small></label><input value="${esc(w.note)}" onchange="setWait(${i}, 'note', this.value)"></div>
+      </div>
+      <div class="btns" style="margin-top:10px">
+        <button class="btn s" onclick="moveWait(${i}, -1)">▲ Move up</button><button class="btn s" onclick="moveWait(${i}, 1)">▼ Move down</button>
+        ${w.puppy ? `<button class="btn" onclick="matchWait(${i})">Reserve this puppy</button>` : ''}
+        <button class="btn d" onclick="delWait(${i})">Remove</button></div></details>`;
+  });
+  $('wait').innerHTML = html;
+}
+function setWait(i, f, v) { waitlist[i][f] = f === 'deposit' ? (parseFloat(v) || 0) : String(v).trim(); save(); render(); }
+function addWait() {
+  const n = $('wn').value.trim();
+  if (!n) { alert('Enter the name first'); return; }
+  waitlist.push({ id: 'w' + Date.now().toString(36), name: n, phone: $('wp').value.trim(), sex: 'any', color: '', wants: '', deposit: 0, depositDate: '', status: 'Waiting', puppy: '', note: '', added: today() });
+  $('wn').value = ''; $('wp').value = '';
+  save(); render();
+}
+function moveWait(i, d) {
+  const j = i + d;
+  if (j < 0 || j >= waitlist.length) return;
+  [waitlist[i], waitlist[j]] = [waitlist[j], waitlist[i]];
+  save(); render();
+}
+function delWait(i) {
+  if (!confirm('Remove ' + waitlist[i].name + ' from the waitlist?')) return;
+  waitlist.splice(i, 1); save(); render();
+}
+function matchWait(i) {
+  const w = waitlist[i], p = puppies.find(x => pkey(x) === w.puppy);
+  if (!p) { alert('Choose a puppy first'); return; }
+  if (p.status === 'Sold') { alert(p.name + ' is already marked Sold.'); return; }
+  if (!confirm('Reserve ' + p.name + ' for ' + w.name + '? Their name, phone and deposit are copied onto the puppy.')) return;
+  p.status = 'Reserved'; p.buyer = w.name; p.phone = w.phone;
+  if (w.deposit) { p.deposit = w.deposit; p.depositDate = w.depositDate; }
+  w.status = 'Matched';
+  save(); render();
+}
+function renderLitters() {
+  const ls2 = litters();
+  let html = '';
+  if (ls2.length) {
+    html += '<h2>Litter summary</h2>';
+    ls2.forEach(l => {
+      const count = s => l.pups.filter(p => p.status === s).length;
+      const kept = count('Kept') + l.adults.length;
+      const income = l.pups.filter(p => p.status === 'Sold').reduce((s, p) => s + p.price, 0);
+      const costs = expenses.filter(e => e.for === 'litter:' + l.key).reduce((s, e) => s + e.amt, 0);
+      const net = income - costs;
+      html += `<div class="card"><b>${esc(l.label)}</b><br>
+        <small>${l.pups.length + l.adults.length} puppies: ${count('Available')} available, ${count('Reserved')} reserved, ${count('Sold')} sold, ${kept} kept${count('Deceased') ? ', ' + count('Deceased') + ' died' : ''}</small><br>
+        Income ${M(income)} · Costs ${M(costs)} · <b class="${net < 0 ? 'over' : 'ok'}">Net ${M(net)}</b></div>`;
+    });
+    html += '<p><small>Costs only include expenses tagged with that litter in the Money tab.</small></p>';
+  }
+  $('litters').innerHTML = html;
+}
+
+// ---------- EXPENSES ----------
+function forOptions() {
+  const o = [['', 'General (not for one dog)']];
+  dogs.forEach(d => o.push(['dog:' + d.name + '|' + d.birth, d.name]));
+  litters().forEach(l => o.push(['litter:' + l.key, 'Litter: ' + l.label]));
+  return o;
+}
+function forLabel(f) {
+  if (!f) return 'General';
+  if (f.startsWith('dog:')) return f.slice(4).split('|')[0];
+  if (f.startsWith('litter:')) {
+    const k = f.slice(7), i = k.lastIndexOf('|');
+    return 'Litter: ' + (k.slice(0, i) || 'Unknown mother') + ', born ' + k.slice(i + 1);
+  }
+  return f;
+}
+function fillFor() {
+  const sel = $('xfor'), c = sel.value;
+  sel.innerHTML = forOptions().map(o => `<option value="${esc(o[0])}">${esc(o[1])}</option>`).join('');
+  if ([...sel.options].some(o => o.value === c)) sel.value = c;
+}
+function addExpense() {
+  const amt = parseFloat($('xamt').value);
+  if (!(amt > 0)) { alert('Enter an amount'); return; }
+  expenses.push({ amt: amt, cat: $('xcat').value, note: $('xnote').value.trim(),
+                  for: $('xfor').value, date: $('xdate').value || today() });
+  $('xamt').value = ''; $('xnote').value = ''; $('xdate').value = today();
+  save(); render();
+}
+function delExpense(i) { expenses.splice(i, 1); save(); render(); }
+function setChartMonth(v) { chartMonth = v; renderExpenses(); }
+function bar(label, val, max) {
+  const w = val > 0 ? Math.max(2, val / max * 100) : 0;
+  return `<div class="bar"><small>${esc(label)}: ${M(val)}</small><i style="width:${w}%"></i></div>`;
+}
+function renderExpenses() {
+  fillFor();
+  if (!chartMonth) chartMonth = today().slice(0, 7);
+  const months = [...new Set(expenses.map(e => e.date.slice(0, 7)).concat(today().slice(0, 7)))].sort().reverse();
+  if (!months.includes(chartMonth)) chartMonth = months[0];
+
+  const inMonth = expenses.filter(e => e.date.slice(0, 7) === chartMonth);
+  const total = inMonth.reduce((s, e) => s + e.amt, 0);
+  const byCat = {};
+  inMonth.forEach(e => { byCat[e.cat] = (byCat[e.cat] || 0) + e.amt; });
+  const catList = Object.entries(byCat).sort((a, b) => b[1] - a[1]);
+  const catMax = catList.length ? catList[0][1] : 1;
+
+  const now = new Date(), six = [];
+  for (let n = 5; n >= 0; n--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - n, 1);
+    const key = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+    six.push([key, expenses.filter(e => e.date.slice(0, 7) === key).reduce((s, e) => s + e.amt, 0)]);
+  }
+  const sixMax = Math.max(1, ...six.map(x => x[1]));
+
+  const byFor = {};
+  expenses.forEach(e => { const l = forLabel(e.for); byFor[l] = (byFor[l] || 0) + e.amt; });
+  const forList = Object.entries(byFor).sort((a, b) => b[1] - a[1]);
+  const forMax = forList.length ? forList[0][1] : 1;
+
+  const monthOpts = months.map(m => `<option ${m === chartMonth ? 'selected' : ''}>${m}</option>`).join('');
+  let html = `<div class="card"><div class="top"><select style="width:auto" onchange="setChartMonth(this.value)">${monthOpts}</select>
+    <b style="font-size:1.4rem">${M(total)}</b></div>`;
+  html += '<h3>By category</h3>' + (catList.map(c => bar(c[0], c[1], catMax)).join('') || '<small>No expenses this month.</small>');
+  html += '<h3>Last 6 months</h3>' + six.map(m => bar(m[0], m[1], sixMax)).join('');
+  html += '<h3>By dog or litter (all time)</h3>' + (forList.map(f => bar(f[0], f[1], forMax)).join('') || '<small>Nothing yet.</small>');
+  html += '</div><h2>All expenses</h2>';
+  for (let i = expenses.length - 1; i >= 0; i--) {
+    const e = expenses[i];
+    html += `<div class="row"><div class="g"><b>${M(e.amt)}</b> · ${e.cat}<br>
+      <small>${e.date} · ${esc(forLabel(e.for))}${e.note ? ' · ' + esc(e.note) : ''}</small></div>
+      <button class="btn d" onclick="delExpense(${i})">Delete</button></div>`;
+  }
+  if (!expenses.length) html += '<p class="mut">No expenses yet.</p>';
+  $('exp').innerHTML = html;
+}
+
+// ---------- DRAW EVERYTHING ----------
+function render() {
+  renderSummary();
+  renderDogs();
+  renderPuppies();
+  renderLitters();
+  renderWaitlist();
+  renderExpenses();
+  updateCounts();
+  hydratePhotos();
+}
+
+// ---------- START ----------
+if (!window.supabase || !window.supabase.createClient) {
+  authMessage('Could not load the cloud connection library. Check your internet connection and reload.');
+} else {
+  supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+  supabaseClient.auth.onAuthStateChange((event, session) => {
+    if (event === 'SIGNED_OUT' || !session) setTimeout(deactivateUser, 0);
+    else if (session.user) setTimeout(() => activateUser(session.user), 0);
+  });
+  supabaseClient.auth.getSession().then(({ data, error }) => {
+    if (error) authMessage('Could not check your sign-in: ' + error.message);
+    else if (data.session) activateUser(data.session.user);
+  });
+}
+setInterval(() => {
+  if (!currentUser) return;
+  if (autoGraduate().length) { save(); render(); }
+  checkNotify();
+}, 30 * 60 * 1000);
+setInterval(checkCloudUpdates, 20000);
+document.addEventListener('visibilitychange', checkCloudUpdates);
+window.addEventListener('online', () => {
+  hydratePhotos();
+  checkCloudUpdates();
+});
+window.addEventListener('offline', () => {
+  if (currentUser) setSyncStatus('Offline. Changes are saved here and queued to sync.', false, cloudDirty);
+});
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./service-worker.js')
+      .catch(error => console.error('Dog Care Manager: service worker registration failed.', error));
+  });
+}
+</script>
+</body>
+</html>
